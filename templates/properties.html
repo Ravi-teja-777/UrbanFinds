@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Properties - PropertyPro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom Styles */
+        :root {
+            --primary-color: #3e92cc;
+            --secondary-color: #2a628f;
+            --accent-color: #13293d;
+            --light-color: #e8f1f2;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .navbar {
+            background-color: var(--accent-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: white !important;
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-brand img {
+            margin-right: 10px;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.85) !important;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: white !important;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 20px;
+        }
+        
+        .card:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            border-radius: 10px 10px 0 0 !important;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.25rem;
+        }
+        
+        .card-header h5 {
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+        
+        .property-img {
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .property-description {
+            height: 48px;
+            overflow: hidden;
+            color: #6c757d;
+        }
+        
+        .property-card {
+            transition: transform 0.2s ease-in-out;
+        }
+        
+        .property-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(62, 146, 204, 0.25);
+        }
+        
+        .section-heading {
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .badge {
+            font-weight: 500;
+            padding: 0.5rem 0.75rem;
+        }
+        
+        .footer {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 40px 0;
+        }
+        
+        .footer a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer a:hover {
+            color: white;
+        }
+        
+        .social-icons a {
+            display: inline-block;
+            margin-right: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .breadcrumb {
+            background-color: transparent;
+        }
+        
+        .breadcrumb-item a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .breadcrumb-item.active {
+            color: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="https://cdn-icons-png.flaticon.com/512/2329/2329140.png" alt="PropertyPro Logo" height="40">
+                PropertyPro
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/properties">Properties</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact">Contact</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle me-1"></i> John Doe
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2"></i> Profile</a></li>
+                            <li><a class="dropdown-item" href="/dashboard"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container py-5">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Properties</li>
+            </ol>
+        </nav>
+        
+        <h2 class="section-heading mb-4">Available Properties</h2>
+        
+        <!-- Search and Filter Section -->
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Search Filters</h5>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('list_properties') }}" method="get">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label for="location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="location" name="location" placeholder="City, State" value="{{ request.args.get('location', '') }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="min_price" class="form-label">Min Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="min_price" name="min_price" placeholder="0" value="{{ request.args.get('min_price', '') }}">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="max_price" class="form-label">Max Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="max_price" name="max_price" placeholder="10000" value="{{ request.args.get('max_price', '') }}">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="bedrooms" class="form-label">Bedrooms</label>
+                            <select class="form-select" id="bedrooms" name="bedrooms">
+                                <option value="">Any</option>
+                                <option value="1" {% if request.args.get('bedrooms') == '1' %}selected{% endif %}>1</option>
+                                <option value="2" {% if request.args.get('bedrooms') == '2' %}selected{% endif %}>2</option>
+                                <option value="3" {% if request.args.get('bedrooms') == '3' %}selected{% endif %}>3</option>
+                                <option value="4" {% if request.args.get('bedrooms') == '4' %}selected{% endif %}>4+</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="property_type" class="form-label">Property Type</label>
+                            <select class="form-select" id="property_type" name="property_type">
+                                <option value="">Any</option>
+                                <option value="apartment" {% if request.args.get('property_type') == 'apartment' %}selected{% endif %}>Apartment</option>
+                                <option value="house" {% if request.args.get('property_type') == 'house' %}selected{% endif %}>House</option>
+                                <option value="condo" {% if request.args.get('property_type') == 'condo' %}selected{% endif %}>Condo</option>
+                                <option value="townhouse" {% if request.args.get('property_type') == 'townhouse' %}selected{% endif %}>Townhouse</option>
+                                <option value="studio" {% if request.args.get('property_type') == 'studio' %}selected{% endif %}>Studio</option>
+                            </select>
+                        </div>
+                        <div class="col-12 text-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search me-1"></i> Search
+                            </button>
+                            <a href="{{ url_for('list_properties') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-redo me-1"></i> Reset
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Property Listings -->
+        <div class="row g-4">
+            {% if properties %}
+                {% for property in properties %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 property-card shadow">
+                            <div class="position-relative">
+                                {% if property.images and property.images|length > 0 %}
+                                    <img src="{{ property.images[0] }}" class="card-img-top property-img" alt="{{ property.title }}">
+                                {% else %}
+                                    <img src="/static/images/property-placeholder.jpg" class="card-img-top property-img" alt="No image available">
+                                {% endif %}
+                                <span class="badge bg-primary position-absolute top-0 end-0 m-3">${{ property.price }}/month</span>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title">{{ property.title }}</h5>
+                                <p class="card-text text-muted">
+                                    <i class="fas fa-map-marker-alt me-1"></i> {{ property.location }}
+                                </p>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span><i class="fas fa-bed me-1"></i> {{ property.bedrooms }} bd</span>
+                                    <span><i class="fas fa-bath me-1"></i> {{ property.bathrooms }} ba</span>
+                                    <span><i class="fas fa-ruler-combined me-1"></i> {{ property.area }} sqft</span>
+                                </div>
+                                <p class="card-text property-description">{{ property.description|truncate(100) }}</p>
+                            </div>
+                            <div class="card-footer bg-white border-top-0 pb-3">
+                                <a href="{{ url_for('view_property', property_id=property.property_id) }}" class="btn btn-primary w-100">
+                                    <i class="fas fa-info-circle me-1"></i> View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i> No properties found matching your criteria. Try adjusting your search filters.
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5>PropertyPro</h5>
+                    <p>Smart property management solution that connects property owners with tenants and streamlines the entire rental process.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                
+                <div class="col-md-2 col-6 mb-4 mb-md-0">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/about">About</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                        <li><a href="/login">Login</a></li>
+                        <li><a href="/register">Register</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-md-2 col-6 mb-4 mb-md-0">
+                    <h5>For Owners</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#">List Property</a></li>
+                        <li><a href="#">Owner Dashboard</a></li>
+                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#">Resources</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-md-4">
+                    <h5>Contact Us</h5>
+                    <address>
+                        <p><i class="fas fa-map-marker-alt me-2"></i> 123 Property Street, Suite 101<br>San Francisco, CA 94107</p>
+                        <p><i class="fas fa-phone me-2"></i> (123) 456-7890</p>
+                        <p><i class="fas fa-envelope me-2"></i> info@propertypro.com</p>
+                    </address>
+                </div>
+            </div>
+            
+            <hr class="my-4 bg-light">
+            
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0">&copy; 2025 PropertyPro. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="mb-0"><a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

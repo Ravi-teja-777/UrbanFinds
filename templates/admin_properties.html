@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Properties - PropertyPro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom Styles */
+        :root {
+            --primary-color: #3e92cc;
+            --secondary-color: #2a628f;
+            --accent-color: #13293d;
+            --light-color: #e8f1f2;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .navbar {
+            background-color: var(--accent-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: white !important;
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-brand img {
+            margin-right: 10px;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.85) !important;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: white !important;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            border-radius: 10px 10px 0 0 !important;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.25rem;
+        }
+        
+        .card-header h2 {
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+        
+        .section-heading {
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .property-card {
+            height: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .property-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .property-img {
+            height: 180px;
+            object-fit: cover;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        
+        .status-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1;
+        }
+        
+        .property-price {
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 1.25rem;
+        }
+        
+        .property-features {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .property-address {
+            color: #495057;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(62, 146, 204, 0.05);
+        }
+        
+        .search-container {
+            position: relative;
+        }
+        
+        .search-container .form-control {
+            padding-left: 2.5rem;
+            border-radius: 20px;
+        }
+        
+        .search-container .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+        
+        .filter-dropdown {
+            border-radius: 20px;
+        }
+        
+        .footer {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 40px 0;
+        }
+        
+        .footer a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+        
+        .social-icons a {
+            display: inline-block;
+            margin-right: 10px;
+            font-size: 1.25rem;
+        }
+        
+        .property-listing-img {
+            width: 100px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        .table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .pagination .page-link {
+            color: var(--primary-color);
+        }
+        
+        .pagination .page-link:hover {
+            color: var(--secondary-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="https://cdn-icons-png.flaticon.com/512/2329/2329140.png" alt="PropertyPro Logo" height="40">
+                PropertyPro
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/properties">Properties</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact">Contact</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle me-1"></i> Admin User
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2"></i> Profile</a></li>
+                            <li><a class="dropdown-item" href="/dashboard"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Content -->
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-12">
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Manage Properties</li>
+                    </ol>
+                </nav>
+                
+                <div class="card shadow mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h2 class="mb-0">Manage Properties</h2>
+                        <a href="/property/add" class="btn btn-light">
+                            <i class="fas fa-plus-circle me-1"></i> Add New Property
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="search-container">
+                                    <i class="fas fa-search search-icon"></i>
+                                    <input type="text" class="form-control" placeholder="Search properties..." id="propertySearch">
+                                </div>
+                            </div>
+                            <div class="col-md-6 d-flex justify-content-end gap-2">
+                                <select class="form-select filter-dropdown" style="width: auto;">
+                                    <option value="all">All Status</option>
+                                    <option value="available">Available</option>
+                                    <option value="rented">Rented</option>
+                                    <option value="pending">Pending</option>
+                                </select>
+                                <select class="form-select filter-dropdown" style="width: auto;">
+                                    <option value="all">All Property Types</option>
+                                    <option value="apartment">Apartment</option>
+                                    <option value="house">House</option>
+                                    <option value="condo">Condo</option>
+                                    <option value="townhouse">Townhouse</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 110px">Image</th>
+                                        <th>Property</th>
+                                        <th>Type</th>
+                                        <th>Address</th>
+                                        <th>Price</th>
+                                        <th>Status</th>
+                                        <th>Added</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <img src="https://via.placeholder.com/100x70" alt="Property" class="property-listing-img">
+                                        </td>
+                                        <td>
+                                            <strong>Modern Downtown Apartment</strong>
+                                            <div class="property-features">
+                                                <span><i class="fas fa-bed text-primary"></i> 2</span> |
+                                                <span><i class="fas fa-bath text-primary"></i> 1</span> |
+                                                <span><i class="fas fa-ruler-combined text-primary"></i> 850 sq ft</span>
+                                            </div>
+                                        </td>
+                                        <td>Apartment</td>
+                                        <td>123 Main St, New York, NY 10001</td>
+                                        <td class="property-price">$1,800/mo</td>
+                                        <td><span class="badge bg-success">Available</span></td>
+                                        <td>May 15, 2025</td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <a href="/property/view/1" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="/property/edit/1" class="btn btn-sm btn-outline-secondary">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <img src="https://via.placeholder.com/100x70" alt="Property" class="property-listing-img">
+                                        </td>
+                                        <td>
+                                            <strong>Spacious Family Home</strong>
+                                            <div class="property-features">
+                                                <span><i class="fas fa-bed text-primary"></i> 4</span> |
+                                                <span><i class="fas fa-bath text-primary"></i> 2.5</span> |
+                                                <span><i class="fas fa-ruler-combined text-primary"></i> 2100 sq ft</span>
+                                            </div>
+                                        </td>
+                                        <td>House</td>
+                                        <td>456 Oak St, Chicago, IL 60611</td>
+                                        <td class="property-price">$2,500/mo</td>
+                                        <td><span class="badge bg-warning text-dark">Pending</span></td>
+                                        <td>May 10, 2025</td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <a href="/property/view/2" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="/property/edit/2" class="btn btn-sm btn-outline-secondary">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <img src="https://via.placeholder.com/100x70" alt="Property" class="property-listing-img">
+                                        </td>
+                                        <td>
+                                            <strong>Luxury Downtown Condo</strong>
+                                            <div class="property-features">
+                                                <span><i class="fas fa-bed text-primary"></i> 2</span> |
+                                                <span><i class="fas fa-bath text-primary"></i> 2</span> |
+                                                <span><i class="fas fa-ruler-combined text-primary"></i> 1200 sq ft</span>
+                                            </div>
+                                        </td>
+                                        <td>Condo</td>
+                                        <td>789 Pine Ave, San Francisco, CA 94109</td>
+                                        <td class="property-price">$3,200/mo</td>
+                                        <td><span class="badge bg-secondary">Rented</span></td>
+                                        <td>May 5, 2025</td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <a href="/property/view/3" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="/property/edit/3" class="btn btn-sm btn-outline-secondary">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <img src="https://via.placeholder.com/100x70" alt="Property" class="property-listing-img">
+                                        </td>
+                                        <td>
+                                            <strong>Studio in Arts District</strong>
+                                            <div class="property-features">
+                                                <span><i class="fas fa-bed text-primary"></i> 1</span> |
+                                                <span><i class="fas fa-bath text-primary"></i> 1</span> |
+                                                <span><i class="fas fa-ruler-combined text-primary"></i> 550 sq ft</span>
+                                            </div>
+                                        </td>
+                                        <td>Studio</td>
+                                        <td>321 Artist Way, Los Angeles, CA 90013</td>
+                                        <td class="property-price">$1,400/mo</td>
+                                        <td><span class="badge bg-success">Available</span></td>
+                                        <td>May 1, 2025</td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <a href="/property/view/4" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="/property/edit/4" class="btn btn-sm btn-outline-secondary">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <img src="https://via.placeholder.com/100x70" alt="Property" class="property-listing-img">
+                                        </td>
+                                        <td>
+                                            <strong>Cozy Townhouse</strong>
+                                            <div class="property-features">
+                                                <span><i class="fas fa-bed text-primary"></i> 3</span> |
+                                                <span><i class="fas fa-bath text-primary"></i> 2</span> |
+                                                <span><i class="fas fa-ruler-combined text-primary"></i> 1500 sq ft</span>
+                                            </div>
+                                        </td>
+                                        <td>Townhouse</td>
+                                        <td>555 Maple Dr, Austin, TX 78704</td>
+                                        <td class="property-price">$2,100/mo</td>
+                                        <td><span class="badge bg-success">Available</span></td>
+                                        <td>Apr 28, 2025</td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <a href="/property/view/5" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="/property/edit/5" class="btn btn-sm btn-outline-secondary">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <nav aria-label="Page navigation" class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                                </li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                
+                <div class="card shadow mt-4">
+                    <div class="card-header">
+                        <h2 class="mb-0">Property Statistics</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3 mb-4 mb-md-0">
+                                <div class="card text-white bg-primary">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="text-uppercase mb-0">Total Properties</h6>
+                                                <h2 class="mb-0 mt-2">27</h2>
+                                            </div>
+                                            <div>
+                                                <i class="fas fa-home fa-3x opacity-50"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-4 mb-md-0">
+                                <div class="card text-white bg-success">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="text-uppercase mb-0">Available</h6>
+                                                <h2 class="mb-0 mt-2">16</h2>
+                                            </div>
+                                            <div>
+                                                <i class="fas fa-check-circle fa-3x opacity-50"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-4 mb-md-0">
+                                <div class="card text-white bg-secondary">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="text-uppercase mb-0">Rented</h6>
+                                                <h2 class="mb-0 mt-2">8</h2>
+                                            </div>
+                                            <div>
+                                                <i class="fas fa-key fa-3x opacity-50"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-dark bg-warning">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="text-uppercase mb-0">Pending</h6>
+                                                <h2 class="mb-0 mt-2">3</h2>
+                                            </div>
+                                            <div>
+                                                <i class="fas fa-clock fa-3x opacity-50"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5>PropertyPro</h5>
+                    <p>Smart property management solution that connects property owners with tenants and streamlines the entire rental process.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                
+                <div class="col-md-2 col-6 mb-4 mb-md-0">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/about">About</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                        <li><a href="/login">Login</a></li>
+                        <li><a href="/register">Register</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-md-2 col-6 mb-4 mb-md-0">
+                    <h5>For Owners</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#">List Property</a></li>
+                        <li><a href="#">Owner Dashboard</a></li>
+                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#">Resources</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-md-4">
+                    <h5>Contact Us</h5>
+                    <address>
+                        <p><i class="fas fa-map-marker-alt me-2"></i> 123 Property Street, Suite 101<br>San Francisco, CA 94107</p>
+                        <p><i class="fas fa-phone me-2"></i> (123) 456-7890</p>
+                        <p><i class="fas fa-envelope me-2"></i> info@propertypro.com</p>
+                    </address>
+                </div>
+            </div>
+            
+            <hr class="my-4 bg-light">
+            
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0">&copy; 2025 PropertyPro. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="mb-0"><a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script>
+        // Search functionality
+        document.getElementById('propertySearch').addEventListener('keyup', function() {
+            const searchValue = this.value.toLowerCase();
+            const tableRows = document.querySelectorAll('tbody tr');
+            
+            tableRows.forEach(row => {
+                const title = row.querySelector('td:nth-child(2) strong').textContent.toLowerCase();
+                const address = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
+                const propertyType = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+                
+                if (title.includes(searchValue) || address.includes(searchValue) || propertyType.includes(searchValue)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+        
+        // Delete confirmation
+        document.querySelectorAll('.btn-outline-danger').forEach(button => {
+            button.addEventListener('click', function() {
+                if (confirm('Are you sure you want to delete this property? This action cannot be undone.')) {
+                    alert('Property deleted successfully');
+                    // Normally would submit a form or make an AJAX request here
+                }
+            });
+        });
+    </script>
+</body>
+</html>

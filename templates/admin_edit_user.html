@@ -1,0 +1,362 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin - Edit User - PropertyPro{% endblock %}
+
+{% block content %}
+<style>
+    /* Custom Styles */
+    :root {
+        --primary-color: #3e92cc;
+        --secondary-color: #2a628f;
+        --accent-color: #13293d;
+        --light-color: #e8f1f2;
+    }
+    
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8f9fa;
+    }
+    
+    .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card:hover {
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-header {
+        border-radius: 10px 10px 0 0 !important;
+        background-color: var(--primary-color);
+        color: white;
+        padding: 1.25rem;
+    }
+    
+    .card-header h2 {
+        font-weight: 600;
+        margin-bottom: 0;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.25rem rgba(62, 146, 204, 0.25);
+    }
+    
+    .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    
+    .btn-primary:hover {
+        background-color: var(--secondary-color);
+        border-color: var(--secondary-color);
+    }
+    
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+    
+    .btn-secondary:hover {
+        background-color: #5a6268;
+        border-color: #545b62;
+    }
+    
+    .section-heading {
+        color: var(--accent-color);
+        border-bottom: 2px solid var(--primary-color);
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-switch .form-check-input {
+        width: 3em;
+        height: 1.5em;
+    }
+    
+    .form-switch .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+</style>
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin_users') }}">Users</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin_view_user', user_id=user.user_id) }}">{{ user.name }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Edit</li>
+                </ol>
+            </nav>
+            
+            <!-- Flash Messages -->
+            {% include 'partials/flash_messages.html' %}
+            
+            <div class="card shadow">
+                <div class="card-header">
+                    <h2 class="mb-0">Edit User: {{ user.name }}</h2>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('admin_edit_user', user_id=user.user_id) }}" id="editUserForm">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h4 class="section-heading">Personal Information</h4>
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Full Name<span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="name" name="name" value="{{ user.name }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email Address<span class="text-danger">*</span></label>
+                                    <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone" value="{{ user.phone }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h4 class="section-heading">Account Settings</h4>
+                                <div class="mb-3">
+                                    <label for="role" class="form-label">Role<span class="text-danger">*</span></label>
+                                    <select class="form-select" id="role" name="role" required>
+                                        <option value="tenant" {% if user.role == 'tenant' %}selected{% endif %}>Tenant</option>
+                                        <option value="owner" {% if user.role == 'owner' %}selected{% endif %}>Property Owner</option>
+                                        <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Administrator</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="status" class="form-label">Account Status<span class="text-danger">*</span></label>
+                                    <select class="form-select" id="status" name="status" required>
+                                        <option value="active" {% if user.status == 'active' %}selected{% endif %}>Active</option>
+                                        <option value="pending" {% if user.status == 'pending' %}selected{% endif %}>Pending</option>
+                                        <option value="suspended" {% if user.status == 'suspended' %}selected{% endif %}>Suspended</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label d-block">Account Verified</label>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="isVerified" name="isVerified" {% if user.verified %}checked{% endif %}>
+                                        <label class="form-check-label" for="isVerified">Email Verified</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h4 class="section-heading">Notification Preferences</h4>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="email_notifications" name="email_notifications" {% if user.email_notifications %}checked{% endif %}>
+                                        <label class="form-check-label" for="email_notifications">Email Notifications</label>
+                                        <small class="d-block text-muted mt-1">Receive updates and alerts via email</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="sms_notifications" name="sms_notifications" {% if user.sms_notifications %}checked{% endif %}>
+                                        <label class="form-check-label" for="sms_notifications">SMS Notifications</label>
+                                        <small class="d-block text-muted mt-1">Receive updates and alerts via text message</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h4 class="section-heading">Password Management</h4>
+                            <div class="card bg-light border-0 mb-3">
+                                <div class="card-body">
+                                    <p class="text-muted">Leave the fields below blank if you don't want to change the user's password.</p>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="new_password" class="form-label">New Password</label>
+                                            <div class="input-group">
+                                                <input type="password" class="form-control" id="new_password" name="new_password">
+                                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="confirm_password" class="form-label">Confirm New Password</label>
+                                            <div class="input-group">
+                                                <input type="password" class="form-control" id="confirm_password" name="confirm_password">
+                                                <button class="btn btn-outline-secondary" type="button" id="toggleConfirmPassword">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="password-strength mt-2 d-none" id="passwordStrength">
+                                        <small class="d-block mb-1">Password strength:</small>
+                                        <div class="progress" style="height: 5px;">
+                                            <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h4 class="section-heading">User Access & Permissions</h4>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="perm-manage-properties" name="permissions" value="manage_properties" {% if 'manage_properties' in user.permissions %}checked{% endif %}>
+                                        <label class="form-check-label" for="perm-manage-properties">Manage Properties</label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="perm-view-reports" name="permissions" value="view_reports" {% if 'view_reports' in user.permissions %}checked{% endif %}>
+                                        <label class="form-check-label" for="perm-view-reports">View Reports</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="perm-manage-users" name="permissions" value="manage_users" {% if 'manage_users' in user.permissions %}checked{% endif %}>
+                                        <label class="form-check-label" for="perm-manage-users">Manage Users</label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="perm-billing-access" name="permissions" value="billing_access" {% if 'billing_access' in user.permissions %}checked{% endif %}>
+                                        <label class="form-check-label" for="perm-billing-access">Billing Access</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="perm-system-settings" name="permissions" value="system_settings" {% if 'system_settings' in user.permissions %}checked{% endif %}>
+                                        <label class="form-check-label" for="perm-system-settings">System Settings</label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="perm-api-access" name="permissions" value="api_access" {% if 'api_access' in user.permissions %}checked{% endif %}>
+                                        <label class="form-check-label" for="perm-api-access">API Access</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ url_for('admin_view_user', user_id=user.user_id) }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Password visibility toggle
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('editUserForm');
+        const newPassword = document.getElementById('new_password');
+        const confirmPassword = document.getElementById('confirm_password');
+        const togglePassword = document.getElementById('togglePassword');
+        const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+        const passwordStrength = document.getElementById('passwordStrength');
+        const progressBar = passwordStrength.querySelector('.progress-bar');
+        
+        // Password visibility toggle
+        togglePassword.addEventListener('click', function() {
+            const type = newPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+            newPassword.setAttribute('type', type);
+            this.querySelector('i').classList.toggle('fa-eye');
+            this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+        
+        toggleConfirmPassword.addEventListener('click', function() {
+            const type = confirmPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+            confirmPassword.setAttribute('type', type);
+            this.querySelector('i').classList.toggle('fa-eye');
+            this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+        
+        // Password strength indicator
+        newPassword.addEventListener('input', function() {
+            if (this.value.length > 0) {
+                passwordStrength.classList.remove('d-none');
+                
+                // Password strength calculation
+                let strength = 0;
+                if (this.value.length >= 8) strength += 25;
+                if (this.value.match(/[a-z]+/)) strength += 25;
+                if (this.value.match(/[A-Z]+/)) strength += 25;
+                if (this.value.match(/[0-9]+/) || this.value.match(/[^a-zA-Z0-9]+/)) strength += 25;
+                
+                progressBar.style.width = strength + '%';
+                
+                if (strength < 50) {
+                    progressBar.classList.remove('bg-warning', 'bg-success');
+                    progressBar.classList.add('bg-danger');
+                } else if (strength < 75) {
+                    progressBar.classList.remove('bg-danger', 'bg-success');
+                    progressBar.classList.add('bg-warning');
+                } else {
+                    progressBar.classList.remove('bg-danger', 'bg-warning');
+                    progressBar.classList.add('bg-success');
+                }
+            } else {
+                passwordStrength.classList.add('d-none');
+            }
+        });
+        
+        // Form validation
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            // Check if passwords match when setting a new password
+            if (newPassword.value && newPassword.value !== confirmPassword.value) {
+                event.preventDefault();
+                
+                // Create alert
+                const alertDiv = document.createElement('div');
+                alertDiv.classList.add('alert', 'alert-danger', 'alert-dismissible', 'fade', 'show', 'mt-3');
+                alertDiv.innerHTML = `
+                    <strong>Error!</strong> Passwords do not match.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                
+                // Insert alert at the top of the form
+                form.prepend(alertDiv);
+                
+                // Focus on confirm password field
+                confirmPassword.focus();
+                
+                // Auto-dismiss alert after 5 seconds
+                setTimeout(() => {
+                    alertDiv.classList.remove('show');
+                    setTimeout(() => alertDiv.remove(), 300);
+                }, 5000);
+            }
+            
+            form.classList.add('was-validated');
+        });
+    });
+</script>
+{% endblock %}

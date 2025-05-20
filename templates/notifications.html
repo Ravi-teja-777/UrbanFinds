@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - Urban Nest</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom Styles */
+        :root {
+            --primary-color: #3e92cc;
+            --secondary-color: #2a628f;
+            --accent-color: #13293d;
+            --light-color: #e8f1f2;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .navbar {
+            background-color: var(--accent-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: white !important;
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-brand img {
+            margin-right: 10px;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.85) !important;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: white !important;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            border-radius: 10px 10px 0 0 !important;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.25rem;
+        }
+        
+        .card-header h2 {
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+        
+        .notification-item {
+            border-radius: 8px;
+            margin-bottom: 15px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .notification-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .notification-unread {
+            border-left: 4px solid var(--primary-color);
+            background-color: rgba(62, 146, 204, 0.05);
+        }
+        
+        .notification-title {
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+        
+        .notification-time {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        
+        .notification-message {
+            margin-top: 8px;
+            margin-bottom: 12px;
+            color: #495057;
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-outline-secondary {
+            color: #6c757d;
+            border-color: #6c757d;
+        }
+        
+        .btn-outline-secondary:hover {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-light {
+            background-color: white;
+            border-color: #e9ecef;
+        }
+        
+        .btn-light:hover {
+            background-color: #f8f9fa;
+            border-color: #dae0e5;
+        }
+        
+        .empty-state {
+            padding: 60px 0;
+            text-align: center;
+        }
+        
+        .empty-state i {
+            color: #adb5bd;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state h4 {
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+        }
+        
+        .empty-state p {
+            color: #6c757d;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .pagination .page-link {
+            color: var(--primary-color);
+            border-color: #dee2e6;
+        }
+        
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .pagination .page-link:focus {
+            box-shadow: 0 0 0 0.25rem rgba(62, 146, 204, 0.25);
+        }
+        
+        .section-heading {
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .footer {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 40px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="https://cdn-icons-png.flaticon.com/512/2329/2329140.png" alt="Urban Nest Logo" height="40">
+                Urban Nest
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/properties">Properties</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact">Contact</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle me-1"></i> John Doe
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2"></i> Profile</a></li>
+                            <li><a class="dropdown-item" href="/dashboard"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Content -->
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Notifications</li>
+                    </ol>
+                </nav>
+                
+                <div class="card shadow">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h2 class="mb-0">Notifications</h2>
+                        {% if notifications %}
+                        <form action="{{ url_for('mark_all_read') }}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-light">
+                                <i class="fas fa-check-double me-1"></i> Mark All as Read
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        {% if notifications %}
+                            <h4 class="section-heading">Your Notifications</h4>
+                            <div class="notification-list">
+                                {% for notification in notifications %}
+                                <div class="notification-item {% if not notification.read %}notification-unread{% endif %}">
+                                    <div class="d-flex justify-content-between">
+                                        <h5 class="notification-title">{{ notification.title }}</h5>
+                                        <span class="notification-time">{{ notification.created_at|timeago }}</span>
+                                    </div>
+                                    <p class="notification-message">{{ notification.message }}</p>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            {% if notification.data and notification.data.application_id %}
+                                            <a href="{{ url_for('view_application', application_id=notification.data.application_id) }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-file-alt me-1"></i> View Application
+                                            </a>
+                                            {% elif notification.data and notification.data.booking_id %}
+                                            <a href="{{ url_for('view_booking', booking_id=notification.data.booking_id) }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-calendar-check me-1"></i> View Booking
+                                            </a>
+                                            {% elif notification.data and notification.data.property_id %}
+                                            <a href="{{ url_for('view_property', property_id=notification.data.property_id) }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-home me-1"></i> View Property
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        {% if not notification.read %}
+                                        <form action="{{ url_for('mark_notification_read', notification_id=notification.notification_id) }}" method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fas fa-check me-1"></i> Mark as Read
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <!-- Pagination -->
+                            {% if pagination and pagination.pages > 1 %}
+                            <nav aria-label="Notification pagination" class="mt-4">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item {% if pagination.page == 1 %}disabled{% endif %}">
+                                        <a class="page-link" href="{{ url_for('notifications', page=pagination.page-1) }}" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                    
+                                    {% for p in range(1, pagination.pages + 1) %}
+                                    <li class="page-item {% if p == pagination.page %}active{% endif %}">
+                                        <a class="page-link" href="{{ url_for('notifications', page=p) }}">{{ p }}</a>
+                                    </li>
+                                    {% endfor %}
+                                    
+                                    <li class="page-item {% if pagination.page == pagination.pages %}disabled{% endif %}">
+                                        <a class="page-link" href="{{ url_for('notifications', page=pagination.page+1) }}" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                            {% endif %}
+                            
+                        {% else %}
+                            <div class="empty-state">
+                                <i class="fas fa-bell-slash fa-4x"></i>
+                                <h4>No Notifications</h4>
+                                <p>You don't have any notifications at this time. We'll notify you about important updates and activities.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5>Urban Nest</h5>
+                    <p>Smart property management solution that connects property owners with tenants and streamlines the entire rental process.</p>
+                    <div class="social-icons">
+                        <a href="#" class="text-white me-2"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-white me-2"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-white me-2"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-white me-2"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                
+                <div class="col-md-2 col-6 mb-4 mb-md-0">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/" class="text-white">Home</a></li>
+                        <li><a href="/about" class="text-white">About</a></li>
+                        <li><a href="/contact" class="text-white">Contact</a></li>
+                        <li><a href="/login" class="text-white">Login</a></li>
+                        <li><a href="/register" class="text-white">Register</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-md-2 col-6 mb-4 mb-md-0">
+                    <h5>For Owners</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white">List Property</a></li>
+                        <li><a href="#" class="text-white">Owner Dashboard</a></li>
+                        <li><a href="#" class="text-white">Pricing</a></li>
+                        <li><a href="#" class="text-white">Resources</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-md-4">
+                    <h5>Contact Us</h5>
+                    <address class="text-white">
+                        <p><i class="fas fa-map-marker-alt me-2"></i> 123 Urban Street, Suite 101<br>San Francisco, CA 94107</p>
+                        <p><i class="fas fa-phone me-2"></i> (123) 456-7890</p>
+                        <p><i class="fas fa-envelope me-2"></i> info@urbannest.com</p>
+                    </address>
+                </div>
+            </div>
+            
+            <hr class="my-4 bg-light">
+            
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0">&copy; 2025 Urban Nest. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="mb-0"><a href="#" class="text-white">Privacy Policy</a> | <a href="#" class="text-white">Terms of Service</a></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

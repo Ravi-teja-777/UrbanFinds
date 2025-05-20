@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply for Property - PropertyPro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom Styles */
+        :root {
+            --primary-color: #3e92cc;
+            --secondary-color: #2a628f;
+            --accent-color: #13293d;
+            --light-color: #e8f1f2;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .navbar {
+            background-color: var(--accent-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: white !important;
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-brand img {
+            margin-right: 10px;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.85) !important;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: white !important;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            border-radius: 10px 10px 0 0 !important;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.25rem;
+        }
+        
+        .card-header h2 {
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(62, 146, 204, 0.25);
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+        }
+        
+        .section-heading {
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .property-image {
+            height: 220px;
+            object-fit: cover;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .property-details {
+            padding: 1.5rem;
+        }
+        
+        .property-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .property-feature {
+            display: flex;
+            align-items: center;
+            margin-right: 1rem;
+        }
+        
+        .property-feature i {
+            color: var(--primary-color);
+            margin-right: 0.5rem;
+        }
+        
+        .feature-icons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .footer {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 40px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="https://cdn-icons-png.flaticon.com/512/2329/2329140.png" alt="PropertyPro Logo" height="40">
+                PropertyPro
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/properties">Properties</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact">Contact</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle me-1"></i> John Doe
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2"></i> Profile</a></li>
+                            <li><a class="dropdown-item" href="/dashboard"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Content -->
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/properties">Properties</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Rental Application</li>
+                    </ol>
+                </nav>
+                
+                <div class="card shadow">
+                    <div class="card-header">
+                        <h2 class="mb-0">Rental Application</h2>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <div class="col-lg-5 mb-4 mb-lg-0">
+                                <div class="card shadow-sm">
+                                    {% if property.images and property.images|length > 0 %}
+                                    <img src="{{ property.images[0] }}" class="property-image" alt="{{ property.title }}">
+                                    {% else %}
+                                    <div class="bg-light text-center py-5 property-image d-flex align-items-center justify-content-center">
+                                        <div>
+                                            <i class="fas fa-home fa-4x text-muted"></i>
+                                            <p class="mt-2">No image available</p>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    <div class="property-details">
+                                        <h4 class="mb-2">{{ property.title }}</h4>
+                                        <p class="mb-2">
+                                            <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                                            {{ property.address }}, {{ property.city }}, {{ property.state }} {{ property.zipcode }}
+                                        </p>
+                                        
+                                        <div class="feature-icons mb-3">
+                                            <div class="property-feature">
+                                                <i class="fas fa-bed"></i>
+                                                <span>{{ property.bedrooms }} bed</span>
+                                            </div>
+                                            <div class="property-feature">
+                                                <i class="fas fa-bath"></i>
+                                                <span>{{ property.bathrooms }} bath</span>
+                                            </div>
+                                            <div class="property-feature">
+                                                <i class="fas fa-ruler-combined"></i>
+                                                <span>{{ property.area }} sq ft</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="property-price mt-3">
+                                            ${{ property.price }}/month
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="card mt-4 p-3 bg-light border-0">
+                                    <h5 class="mb-3"><i class="fas fa-info-circle text-primary me-2"></i>Application Tips</h5>
+                                    <ul class="ps-3 mb-0">
+                                        <li>Complete all required fields marked with *</li>
+                                        <li>Provide accurate income information</li>
+                                        <li>Include any special circumstances in the notes</li>
+                                        <li>Applications are typically reviewed within 48 hours</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-7">
+                                <form method="POST" id="applicationForm">
+                                    <h4 class="section-heading">Application Details</h4>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="move_in_date" class="form-label">Desired Move-in Date<span class="text-danger">*</span></label>
+                                            <input type="date" class="form-control" id="move_in_date" name="move_in_date" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="duration" class="form-label">Lease Duration<span class="text-danger">*</span></label>
+                                            <select class="form-select" id="duration" name="duration" required>
+                                                <option value="6">6 months</option>
+                                                <option value="12" selected>12 months</option>
+                                                <option value="18">18 months</option>
+                                                <option value="24">24 months</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <h4 class="section-heading mt-4">Financial Information</h4>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="monthly_income" class="form-label">Monthly Income ($)<span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" class="form-control" id="monthly_income" name="monthly_income" min="0" required>
+                                            </div>
+                                            <small class="text-muted">Gross monthly income before taxes</small>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="employment_status" class="form-label">Employment Status<span class="text-danger">*</span></label>
+                                            <select class="form-select" id="employment_status" name="employment_status" required>
+                                                <option value="">Select status</option>
+                                                <option value="full_time">Full-time</option>
+                                                <option value="part_time">Part-time</option>
+                                                <option value="self_employed">Self-employed</option>
+                                                <option value="student">Student</option>
+                                                <option value="retired">Retired</option>
+                                                <option value="unemployed">Unemployed</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="employer" class="form-label">Employer Name</label>
+                                        <input type="text" class="form-control" id="employer" name="employer">
+                                        <small class="text-muted">If applicable</small>
+                                    </div>
+                                    
+                                    <h4 class="section-heading mt-4">Additional Information</h4>
+                                    
+                                    <div class="mb-3">
+                                        <label for="occupants" class="form-label">Total Occupants<span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" id="occupants" name="occupants" min="1" value="1" required>
+                                        <small class="text-muted">Include all adults and children who will live in the property</small>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="pets" class="form-label">Do you have pets?</label>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="hasPets" name="hasPets">
+                                            <label class="form-check-label" for="hasPets">Yes, I have pets</label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="petsDetails" class="mb-3 ps-4 border-start" style="display: none;">
+                                        <div class="mb-3">
+                                            <label for="petTypes" class="form-label">Pet Types</label>
+                                            <input type="text" class="form-control" id="petTypes" name="petTypes" placeholder="e.g., 1 cat, 2 dogs">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="additional_notes" class="form-label">Additional Notes</label>
+                                        <textarea class="form-control" id="additional_notes" name="additional_notes" rows="4" placeholder="Include any additional information that might be relevant to your application..."></textarea>
+                                        <small class="text-muted">Include any special requirements or circumstances</small>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between mt-4">
+                                        <a href="{{ url_for('view_property', property_id=property.property_id) }}" class="btn btn-secondary">
+                                            <i class="fas fa-arrow-left me-1"></i> Back to Property
+                                        </a>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-paper-plane me-1"></i> Submit Application
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5>PropertyPro</h5>
+                    <p>Smart property management solution that connects property owners with tenants and streamlines the entire rental process.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                
+                <div class="col-md-2 col-6 mb-4 mb-md-0">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/about">About</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                        <li><a href="/login">Login</a></li>
+                        <li><a href="/register">Register</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-md-2 col-6 mb-4 mb-md-0">
+                    <h5>For Renters</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#">Search Properties</a></li>
+                        <li><a href="#">Renter Dashboard</a></li>
+                        <li><a href="#">Resources</a></li>
+                        <li><a href="#">FAQs</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-md-4">
+                    <h5>Contact Us</h5>
+                    <address>
+                        <p><i class="fas fa-map-marker-alt me-2"></i> 123 Property Street, Suite 101<br>San Francisco, CA 94107</p>
+                        <p><i class="fas fa-phone me-2"></i> (123) 456-7890</p>
+                        <p><i class="fas fa-envelope me-2"></i> info@propertypro.com</p>
+                    </address>
+                </div>
+            </div>
+            
+            <hr class="my-4 bg-light">
+            
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0">&copy; 2025 PropertyPro. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="mb-0"><a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script>
+        // Toggle pets details section
+        document.getElementById('hasPets').addEventListener('change', function() {
+            const petsDetails = document.getElementById('petsDetails');
+            petsDetails.style.display = this.checked ? 'block' : 'none';
+        });
+        
+        // Form validation
+        document.getElementById('applicationForm').addEventListener('submit', function(event) {
+            const form = this;
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+    </script>
+</body>
+</html>

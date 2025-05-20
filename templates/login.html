@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top" style="background-color: #13293d;">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <img src="https://cdn-icons-png.flaticon.com/512/2329/2329140.png" alt="PropertyPro Logo" height="40">
+            PropertyPro
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/about">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/contact">Contact</a>
+                </li>
+            </ul>
+            <div class="d-flex">
+                <a href="/login" class="btn btn-primary me-2 active">Login</a>
+                <a href="/register" class="btn btn-outline-light">Register</a>
+            </div>
+        </div>
+    </div>
+</nav>
+<section class="py-5" style="background: linear-gradient(rgba(19, 41, 61, 0.7), rgba(19, 41, 61, 0.7)), 
+                        url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1073&q=80') no-repeat center center; background-size: cover; min-height: 100vh; display: flex; align-items: center;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="feature-box p-4 bg-white">
+                    <div class="text-center mb-4">
+                        <div class="feature-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h2 class="fw-bold">Login to Your Account</h2>
+                        <p class="text-muted">Welcome back! Enter your credentials to access your PropertyPro dashboard</p>
+                    </div>
+                    <form method="post" action="{{ url_for('login') }}">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email address</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                            </div>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                            <label class="form-check-label" for="remember">Remember me</label>
+                            <a href="#" class="float-end">Forgot password?</a>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">Login</button>
+                        </div>
+                    </form>
+                    <div class="mt-4 text-center">
+                        <p>Don't have an account? <a href="{{ url_for('register') }}" class="fw-bold">Register here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

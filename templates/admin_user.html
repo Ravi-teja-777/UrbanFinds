@@ -1,0 +1,322 @@
+{% extends "base.html" %}
+
+{% block title %}Admin - User Management{% endblock %}
+
+{% block content %}
+<!-- Content -->
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">User Management</li>
+                </ol>
+            </nav>
+            
+            <div class="card shadow">
+                <div class="card-header">
+                    <h2 class="mb-0">User Management</h2>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-4">Manage all users in the system</p>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-primary" id="exportUsersBtn">
+                                <i class="fas fa-download me-1"></i> Export Users
+                            </button>
+                            <a href="{{ url_for('admin_add_user') }}" class="btn btn-primary">
+                                <i class="fas fa-user-plus me-1"></i> Add New User
+                            </a>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <div class="input-group">
+                                <input type="text" id="userSearch" class="form-control" placeholder="Search users...">
+                                <button class="btn btn-outline-secondary" type="button">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown">
+                                    <i class="fas fa-filter me-1"></i> Filter
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="filterDropdown">
+                                    <li><h6 class="dropdown-header">User Role</h6></li>
+                                    <li><a class="dropdown-item filter-option" data-role="all" href="#">All Roles</a></li>
+                                    <li><a class="dropdown-item filter-option" data-role="tenant" href="#">Tenants</a></li>
+                                    <li><a class="dropdown-item filter-option" data-role="owner" href="#">Property Owners</a></li>
+                                    <li><a class="dropdown-item filter-option" data-role="admin" href="#">Administrators</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><h6 class="dropdown-header">Account Status</h6></li>
+                                    <li><a class="dropdown-item filter-option" data-status="all" href="#">All Status</a></li>
+                                    <li><a class="dropdown-item filter-option" data-status="active" href="#">Active</a></li>
+                                    <li><a class="dropdown-item filter-option" data-status="inactive" href="#">Inactive</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Registered</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                <tr class="user-row" data-role="{{ user.role }}" data-status="{{ user.status }}">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle me-2">
+                                                {{ user.name[0]|upper }}
+                                            </div>
+                                            <div>{{ user.name }}</div>
+                                        </div>
+                                    </td>
+                                    <td>{{ user.email }}</td>
+                                    <td>
+                                        {% if user.role == 'admin' %}
+                                            <span class="badge bg-danger">Admin</span>
+                                        {% elif user.role == 'owner' %}
+                                            <span class="badge bg-success">Property Owner</span>
+                                        {% elif user.role == 'tenant' %}
+                                            <span class="badge bg-info">Tenant</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ user.role }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if user.status == 'active' %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ user.created_at|slice:":10" }}</td>
+                                    <td>
+                                        <div class="d-flex justify-content-center gap-2">
+                                            <a href="{{ url_for('admin_view_user', user_id=user.user_id) }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ url_for('admin_edit_user', user_id=user.user_id) }}" class="btn btn-sm btn-secondary" data-bs-toggle="tooltip" title="Edit User">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal{{ user.user_id }}" title="Delete User">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Delete Modal for each user -->
+                                        <div class="modal fade" id="deleteUserModal{{ user.user_id }}" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Delete User</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p>Are you sure you want to delete the user <strong>{{ user.name }}</strong>?</p>
+                                                        <p class="text-danger">This action cannot be undone.</p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                            <i class="fas fa-times me-1"></i> Cancel
+                                                        </button>
+                                                        <form action="{{ url_for('admin_delete_user', user_id=user.user_id) }}" method="POST">
+                                                            <button type="submit" class="btn btn-danger">
+                                                                <i class="fas fa-trash-alt me-1"></i> Delete
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">
+                                        <div class="alert alert-info mb-0">
+                                            <i class="fas fa-info-circle me-2"></i> No users found
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <div>
+                            <span class="text-muted">Showing {{ users|length }} of {{ total_users }} users</span>
+                        </div>
+                        <nav aria-label="User pagination">
+                            <ul class="pagination mb-0">
+                                <li class="page-item {% if current_page == 1 %}disabled{% endif %}">
+                                    <a class="page-link" href="{{ url_for('admin_users', page=current_page-1) }}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                {% for i in range(1, total_pages + 1) %}
+                                <li class="page-item {% if current_page == i %}active{% endif %}">
+                                    <a class="page-link" href="{{ url_for('admin_users', page=i) }}">{{ i }}</a>
+                                </li>
+                                {% endfor %}
+                                <li class="page-item {% if current_page == total_pages %}disabled{% endif %}">
+                                    <a class="page-link" href="{{ url_for('admin_users', page=current_page+1) }}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Custom Styles */
+    :root {
+        --primary-color: #3e92cc;
+        --secondary-color: #2a628f;
+        --accent-color: #13293d;
+        --light-color: #e8f1f2;
+    }
+    
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8f9fa;
+    }
+    
+    .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card:hover {
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-header {
+        border-radius: 10px 10px 0 0 !important;
+        background-color: var(--primary-color);
+        color: white;
+        padding: 1.25rem;
+    }
+    
+    .card-header h2 {
+        font-weight: 600;
+        margin-bottom: 0;
+    }
+    
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    
+    .btn-primary:hover {
+        background-color: var(--secondary-color);
+        border-color: var(--secondary-color);
+    }
+    
+    .avatar-circle {
+        width: 36px;
+        height: 36px;
+        background-color: var(--primary-color);
+        color: white;
+        font-weight: 500;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .table thead {
+        background-color: #f8f9fa;
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: rgba(62, 146, 204, 0.05);
+    }
+    
+    .pagination .page-link {
+        color: var(--primary-color);
+    }
+    
+    .pagination .page-item.active .page-link {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Enable tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+        
+        // Search functionality
+        document.getElementById('userSearch').addEventListener('keyup', function() {
+            let searchTerm = this.value.toLowerCase();
+            let userRows = document.querySelectorAll('.user-row');
+            
+            userRows.forEach(row => {
+                let userName = row.querySelector('td:first-child').textContent.toLowerCase();
+                let userEmail = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                
+                if (userName.includes(searchTerm) || userEmail.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+        
+        // Filter functionality
+        document.querySelectorAll('.filter-option').forEach(option => {
+            option.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                let filterType = this.hasAttribute('data-role') ? 'role' : 'status';
+                let filterValue = this.getAttribute(`data-${filterType}`);
+                
+                let userRows = document.querySelectorAll('.user-row');
+                
+                userRows.forEach(row => {
+                    if (filterValue === 'all') {
+                        row.style.display = '';
+                    } else {
+                        let rowValue = row.getAttribute(`data-${filterType}`);
+                        row.style.display = (rowValue === filterValue) ? '' : 'none';
+                    }
+                });
+                
+                // Update the filter button text
+                document.getElementById('filterDropdown').innerHTML = 
+                    `<i class="fas fa-filter me-1"></i> ${this.textContent}`;
+            });
+        });
+        
+        // Export Users Button
+        document.getElementById('exportUsersBtn').addEventListener('click', function() {
+            alert('Exporting users functionality would be implemented here');
+        });
+    });
+</script>
+{% endblock %}

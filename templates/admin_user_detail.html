@@ -1,0 +1,304 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin - User Details{% endblock %}
+
+{% block content %}
+<!-- Content -->
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin_users') }}">Users</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ user.name }}</li>
+                </ol>
+            </nav>
+            
+            <!-- Flash Messages -->
+            {% include 'partials/flash_messages.html' %}
+            
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card shadow mb-4">
+                        <div class="card-header">
+                            <h2 class="mb-0">User Profile</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-center mb-3">
+                                <div class="avatar-placeholder">
+                                    <span>{{ user.name|slice(0, 1)|upper }}</span>
+                                </div>
+                            </div>
+                            <h3 class="h4 text-center mb-3">{{ user.name }}</h3>
+                            <div class="d-flex justify-content-center mb-4">
+                                <span class="badge {% if user.role == 'admin' %}bg-danger{% elif user.role == 'owner' %}bg-success{% else %}bg-info{% endif %} me-2">
+                                    {{ user.role|capitalize }}
+                                </span>
+                                <span class="badge {% if user.status == 'active' %}bg-success{% elif user.status == 'pending' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                    {{ user.status|capitalize }}
+                                </span>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span>Email:</span>
+                                    <span>{{ user.email }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span>Phone:</span>
+                                    <span>{{ user.phone }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span>Registered:</span>
+                                    <span>{{ user.created_at|slice(0, 10) }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span>Last Updated:</span>
+                                    <span>{{ user.updated_at|slice(0, 10) if user.updated_at else 'N/A' }}</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="card-footer">
+                            <div class="d-flex justify-content-between">
+                                <a href="{{ url_for('admin_edit_user', user_id=user.user_id) }}" class="btn btn-primary">
+                                    <i class="fas fa-edit me-1"></i> Edit User
+                                </a>
+                                <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#statusModal">
+                                    <i class="fas {% if user.status == 'active' %}fa-user-slash{% else %}fa-user-check{% endif %} me-1"></i>
+                                    {% if user.status == 'active' %}
+                                        Suspend
+                                    {% elif user.status == 'suspended' %}
+                                        Reactivate
+                                    {% endif %}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <!-- Account Activity -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header">
+                            <h2 class="mb-0">Account Activity</h2>
+                        </div>
+                        <div class="card-body">
+                            <!-- Properties Tab for Owners -->
+                            {% if user.role == 'owner' %}
+                                <h4 class="section-heading">Properties ({{ properties|length }})</h4>
+                                {% if properties %}
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Property</th>
+                                                    <th>Type</th>
+                                                    <th>Location</th>
+                                                    <th>Price</th>
+                                                    <th>Status</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for property in properties %}
+                                                    <tr>
+                                                        <td>{{ property.title }}</td>
+                                                        <td>{{ property.property_type }}</td>
+                                                        <td>{{ property.location }}</td>
+                                                        <td>${{ '%0.2f'|format(property.price) }}</td>
+                                                        <td>
+                                                            <span class="badge {% if property.status == 'available' %}bg-success{% elif property.status == 'leased' %}bg-info{% else %}bg-secondary{% endif %}">
+                                                                {{ property.status|capitalize }}
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <a href="{{ url_for('view_property', property_id=property.property_id) }}" class="btn btn-sm btn-primary">
+                                                                <i class="fas fa-eye me-1"></i> View
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle me-2"></i> No properties listed by this owner.
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                            
+                            <!-- Bookings Tab for Tenants -->
+                            {% if user.role == 'tenant' %}
+                                <h4 class="section-heading">Bookings ({{ bookings|length }})</h4>
+                                {% if bookings %}
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Property</th>
+                                                    <th>Start Date</th>
+                                                    <th>End Date</th>
+                                                    <th>Monthly Rent</th>
+                                                    <th>Status</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for booking in bookings %}
+                                                    <tr>
+                                                        <td>{{ booking.property_details.title if booking.property_details else 'Unknown Property' }}</td>
+                                                        <td>{{ booking.start_date|slice(0, 10) }}</td>
+                                                        <td>{{ booking.end_date|slice(0, 10) }}</td>
+                                                        <td>${{ '%0.2f'|format(booking.monthly_rent) }}</td>
+                                                        <td>
+                                                            <span class="badge {% if booking.status == 'active' %}bg-success{% elif booking.status == 'pending_payment' %}bg-warning{% elif booking.status == 'cancelled' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                                                {{ booking.status|replace('_', ' ')|capitalize }}
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <a href="{{ url_for('view_booking', booking_id=booking.booking_id) }}" class="btn btn-sm btn-primary">
+                                                                <i class="fas fa-eye me-1"></i> View
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle me-2"></i> No bookings found for this tenant.
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Status Change Modal -->
+<div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="statusModalLabel">
+                    {% if user.status == 'active' %}
+                        Suspend Account
+                    {% elif user.status == 'suspended' %}
+                        Reactivate Account
+                    {% endif %}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ url_for('admin_edit_user', user_id=user.user_id) }}" method="post">
+                <div class="modal-body">
+                    {% if user.status == 'active' %}
+                        <p>Are you sure you want to suspend this user account? The user will no longer be able to log in or use the platform.</p>
+                        <div class="mb-3">
+                            <label for="reason" class="form-label">Reason for suspension</label>
+                            <textarea class="form-control" id="reason" name="reason" rows="3" required></textarea>
+                        </div>
+                        <input type="hidden" name="status" value="suspended">
+                    {% elif user.status == 'suspended' %}
+                        <p>Are you sure you want to reactivate this user account? The user will be able to log in and use the platform again.</p>
+                        <input type="hidden" name="status" value="active">
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn {% if user.status == 'active' %}btn-danger{% else %}btn-success{% endif %}">
+                        <i class="fas {% if user.status == 'active' %}fa-user-slash{% else %}fa-user-check{% endif %} me-1"></i>
+                        {% if user.status == 'active' %}
+                            Suspend Account
+                        {% elif user.status == 'suspended' %}
+                            Reactivate Account
+                        {% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Custom Styles */
+    :root {
+        --primary-color: #3e92cc;
+        --secondary-color: #2a628f;
+        --accent-color: #13293d;
+        --light-color: #e8f1f2;
+    }
+    
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8f9fa;
+    }
+    
+    .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card:hover {
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-header {
+        border-radius: 10px 10px 0 0 !important;
+        background-color: var(--primary-color);
+        color: white;
+        padding: 1.25rem;
+    }
+    
+    .card-header h2 {
+        font-weight: 600;
+        margin-bottom: 0;
+    }
+    
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    
+    .btn-primary:hover {
+        background-color: var(--secondary-color);
+        border-color: var(--secondary-color);
+    }
+    
+    .section-heading {
+        color: var(--accent-color);
+        border-bottom: 2px solid var(--primary-color);
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .avatar-placeholder {
+        width: 80px;
+        height: 80px;
+        background-color: var(--primary-color);
+        color: white;
+        font-size: 2rem;
+        font-weight: 600;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+    }
+    
+    .table thead {
+        background-color: #f8f9fa;
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: rgba(62, 146, 204, 0.05);
+    }
+</style>
+{% endblock %}

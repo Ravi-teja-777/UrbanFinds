@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Edit Property - PropertyPro{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom Styles */
+        :root {
+            --primary-color: #3e92cc;
+            --secondary-color: #2a628f;
+            --accent-color: #13293d;
+            --light-color: #e8f1f2;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .navbar {
+            background-color: var(--accent-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: white !important;
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-brand img {
+            margin-right: 10px;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.85) !important;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: white !important;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            border-radius: 10px 10px 0 0 !important;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.25rem;
+        }
+        
+        .card-header h2 {
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(62, 146, 204, 0.25);
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+        }
+        
+        .section-heading {
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        #imagePreview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .preview-image {
+            width: 150px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .footer {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 40px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="https://cdn-icons-png.flaticon.com/512/2329/2329140.png" alt="PropertyPro Logo" height="40">
+                PropertyPro
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/properties">Properties</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact">Contact</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle me-1"></i> John Doe
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2"></i> Profile</a></li>
+                            <li><a class="dropdown-item" href="/dashboard"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Content -->
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Edit Property</li>
+                    </ol>
+                </nav>
+                
+                <div class="card shadow">
+                    <div class="card-header">
+                        <h2 class="mb-0">Edit Property: {{ property.title }}</h2>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" enctype="multipart/form-data" id="propertyForm">
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <h4 class="section-heading">Basic Information</h4>
+                                    <div class="mb-3">
+                                        <label for="title" class="form-label">Property Title<span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="title" name="title" value="{{ property.title }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="property_type" class="form-label">Property Type<span class="text-danger">*</span></label>
+                                        <select class="form-select" id="property_type" name="property_type" required>
+                                            <option value="">Select type</option>
+                                            <option value="apartment" {% if property.property_type == 'apartment' %}selected{% endif %}>Apartment</option>
+                                            <option value="house" {% if property.property_type == 'house' %}selected{% endif %}>House</option>
+                                            <option value="condo" {% if property.property_type == 'condo' %}selected{% endif %}>Condo</option>
+                                            <option value="townhouse" {% if property.property_type == 'townhouse' %}selected{% endif %}>Townhouse</option>
+                                            <option value="studio" {% if property.property_type == 'studio' %}selected{% endif %}>Studio</option>
+                                        </select>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col">
+                                            <label for="bedrooms" class="form-label">Bedrooms<span class="text-danger">*</span></label>
+                                            <input type="number" class="form-control" id="bedrooms" name="bedrooms" min="0" value="{{ property.bedrooms }}" required>
+                                        </div>
+                                        <div class="col">
+                                            <label for="bathrooms" class="form-label">Bathrooms<span class="text-danger">*</span></label>
+                                            <input type="number" class="form-control" id="bathrooms" name="bathrooms" min="0" step="0.5" value="{{ property.bathrooms }}" required>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col">
+                                            <label for="area" class="form-label">Area (sq ft)<span class="text-danger">*</span></label>
+                                            <input type="number" class="form-control" id="area" name="area" min="0" value="{{ property.area }}" required>
+                                        </div>
+                                        <div class="col">
+                                            <label for="price" class="form-label">Monthly Rent ($)<span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" class="form-control" id="price" name="price" min="0" value="{{ property.price }}" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="status" class="form-label">Status<span class="text-danger">*</span></label>
+                                        <select class="form-select" id="status" name="status" required>
+                                            <option value="available" {% if property.status == 'available' %}selected{% endif %}>Available</option>
+                                            <option value="leased" {% if property.status == 'leased' %}selected{% endif %}>Leased</option>
+                                            <option value="maintenance" {% if property.status == 'maintenance' %}selected{% endif %}>Under Maintenance</option>
+                                            <option value="inactive" {% if property.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h4 class="section-heading">Location</h4>
+                                    <div class="mb-3">
+                                        <label for="address" class="form-label">Street Address<span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="address" name="address" value="{{ property.address }}" required>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="city" class="form-label">City<span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="city" name="city" value="{{ property.city }}" required>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="state" class="form-label">State<span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="state" name="state" value="{{ property.state }}" required>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label for="zipcode" class="form-label">Zipcode<span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="zipcode" name="zipcode" value="{{ property.zipcode }}" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <h4 class="section-heading">Description</h4>
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Property Description<span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="description" name="description" rows="5" required>{{ property.description }}</textarea>
+                                    <small class="text-muted">Describe the property, its neighborhood, and any special features.</small>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <h4 class="section-heading">Amenities</h4>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="amenity-parking" name="amenities" value="parking" {% if 'parking' in property.amenities %}checked{% endif %}>
+                                            <label class="form-check-label" for="amenity-parking">Parking</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="amenity-wifi" name="amenities" value="wifi" {% if 'wifi' in property.amenities %}checked{% endif %}>
+                                            <label class="form-check-label" for="amenity-wifi">WiFi</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="amenity-gym" name="amenities" value="gym" {% if 'gym' in property.amenities %}checked{% endif %}>
+                                            <label class="form-check-label" for="amenity-gym">Gym</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="amenity-pool" name="amenities" value="pool" {% if 'pool' in property.amenities %}checked{% endif %}>
+                                            <label class="form-check-label" for="amenity-pool">Pool</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="amenity-ac" name="amenities" value="ac" {% if 'ac' in property.amenities %}checked{% endif %}>
+                                            <label class="form-check-label" for="amenity-ac">Air Conditioning</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="amenity-heating" name="amenities" value="heating" {% if 'heating' in property.amenities %}checked{% endif %}>
+                                            <label class="form-check-label" for="amenity-heating">Heating</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="amenity-laundry" name="amenities" value="laundry" {% if 'laundry' in property.amenities %}checked{% endif %}>
+                                            <label class="form-check-label" for="amenity-laundry">Laundry</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="amenity-furnished" name="amenities" value="furnished" {% if 'furnished' in property.amenities %}checked{% endif %}>
+                                            <label class="form-check-label" for="amenity-furnished">Furnished</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="amenity-pets" name="amenities" value="pets_allowed" {% if 'pets_allowed' in property.amenities %}checked{% endif %}>
+                                            <label class="form-check-label" for="amenity-pets">Pets Allowed</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <h4 class="section-heading">Current Images</h4>
+                                <div class="row" id="currentImages">
+                                    {% if property.images %}
+                                        {% for image in property.images %}
+                                        <div class="col-md-3 mb-3">
+                                            <div class="card">
+                                                <img src="{{ image }}" class="card-img-top" alt="Property image">
+                                                <div class="card-body">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="keep-image-{{ loop.index }}" name="keep_images" value="{{ image }}" checked>
+                                                        <label class="form-check-label" for="keep-image-{{ loop.index }}">Keep</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="col-12">
+                                            <p class="text-muted">No images uploaded for this property.</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <h4 class="section-heading">Upload New Images</h4>
+                                <div class="mb-3">
+                                    <label for="images" class="form-label">Add More Images</label>
+                                    <input type="file" class="form-control" id="images" name="images" multiple accept="image/*" onchange="previewImages()">
+                                    <small class="text-muted">You can select multiple images. Recommended: 4-6 high-quality images.</small>
+                                    <div id="imagePreview" class="mt-3"></div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <a href="{{ url_for('view_property', property_id=property.property_id) }}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left me-1"></i> Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i> Update Property
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5>PropertyPro</h5>
+                    <p>Smart property management solution that connects property owners with tenants and streamlines the entire rental process.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                
+                <div class="col-md-2 col-6 mb-4 mb-md-0">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/about">About</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                        <li><a href="/login">Login</a></li>
+                        <li><a href="/register">Register</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-md-2 col-6 mb-4 mb-md-0">
+                    <h5>For Owners</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#">List Property</a></li>
+                        <li><a href="#">Owner Dashboard</a></li>
+                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#">Resources</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-md-4">
+                    <h5>Contact Us</h5>
+                    <address>
+                        <p><i class="fas fa-map-marker-alt me-2"></i> 123 Property Street, Suite 101<br>San Francisco, CA 94107</p>
+                        <p><i class="fas fa-phone me-2"></i> (123) 456-7890</p>
+                        <p><i class="fas fa-envelope me-2"></i> info@propertypro.com</p>
+                    </address>
+                </div>
+            </div>
+            
+            <hr class="my-4 bg-light">
+            
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0">&copy; 2025 PropertyPro. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="mb-0"><a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS for image preview -->
+    <script>
+        function previewImages() {
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = '';
+            const files = document.getElementById('images').files;
+            
+            if (files.length > 0) {
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    if (file.type.includes('image')) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const img = document.createElement('img');
+                            img.src = e.target.result;
+                            img.classList.add('preview-image');
+                            preview.appendChild(img);
+                        }
+                        reader.readAsDataURL(file);
+                    }
+                }
+            }
+        }
+        
+        // Form validation
+        document.getElementById('propertyForm').addEventListener('submit', function(event) {
+            const form = this;
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+    </script>
+</body>
+</html>

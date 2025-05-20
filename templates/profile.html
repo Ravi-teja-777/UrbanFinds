@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+
+{% block title %}Register - PropertyPro{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Register</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-user-plus me-2"></i>Create an Account</h4>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted mb-4">Join PropertyPro to start your journey with us. Fill in the details below to create your account.</p>
+                    
+                    <form method="POST" action="{{ url_for('register') }}" id="registrationForm">
+                        <h5 class="section-heading">Personal Information</h5>
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">Full Name<span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                    <input type="text" class="form-control" id="name" name="name" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email Address<span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h5 class="section-heading">Security</h5>
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label">Password<span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                    <input type="password" class="form-control" id="password" name="password" required>
+                                </div>
+                                <small class="text-muted">Minimum 8 characters with at least one uppercase letter, number, and special character</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="confirm_password" class="form-label">Confirm Password<span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h5 class="section-heading">Contact & Preferences</h5>
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                    <input type="tel" class="form-control" id="phone" name="phone" placeholder="(123) 456-7890">
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="role" class="form-label">Account Type<span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
+                                    <select class="form-select" id="role" name="role" required>
+                                        <option value="" selected disabled>Select account type</option>
+                                        <option value="tenant">Tenant - Looking for properties to rent</option>
+                                        <option value="owner">Property Owner - Want to list properties</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="terms" name="terms" required>
+                                <label class="form-check-label" for="terms">
+                                    I agree to the <a href="#" class="text-primary">Terms of Service</a> and <a href="#" class="text-primary">Privacy Policy</a>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-user-plus me-2"></i>Create Account
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer bg-light p-3 text-center">
+                    <p class="mb-0">Already have an account? <a href="{{ url_for('login') }}" class="text-primary fw-bold">Log In</a></p>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <p class="text-muted">Or register with</p>
+                <div class="social-login mb-3">
+                    <button class="btn btn-outline-primary me-2">
+                        <i class="fab fa-google me-2"></i>Google
+                    </button>
+                    <button class="btn btn-outline-primary me-2">
+                        <i class="fab fa-facebook me-2"></i>Facebook
+                    </button>
+                    <button class="btn btn-outline-primary">
+                        <i class="fab fa-apple me-2"></i>Apple
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Custom Styles to match the property pages */
+    :root {
+        --primary-color: #3e92cc;
+        --secondary-color: #2a628f;
+        --accent-color: #13293d;
+        --light-color: #e8f1f2;
+    }
+    
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8f9fa;
+    }
+    
+    .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .card-header {
+        border-radius: 10px 10px 0 0 !important;
+        padding: 1.25rem;
+    }
+    
+    .section-heading {
+        color: var(--accent-color);
+        border-bottom: 2px solid var(--primary-color);
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    
+    .btn-primary:hover {
+        background-color: var(--secondary-color);
+        border-color: var(--secondary-color);
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.25rem rgba(62, 146, 204, 0.25);
+    }
+    
+    .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    
+    .breadcrumb a {
+        color: var(--primary-color);
+        text-decoration: none;
+    }
+    
+    .breadcrumb a:hover {
+        text-decoration: underline;
+    }
+    
+    .social-login button {
+        min-width: 120px;
+    }
+</style>
+
+<script>
+    // Form validation
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('registrationForm');
+        
+        if (form) {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                
+                // Custom password validation
+                const password = document.getElementById('password');
+                const confirmPassword = document.getElementById('confirm_password');
+                
+                if (password.value !== confirmPassword.value) {
+                    confirmPassword.setCustomValidity("Passwords don't match");
+                    event.preventDefault();
+                } else {
+                    confirmPassword.setCustomValidity('');
+                }
+                
+                form.classList.add('was-validated');
+            });
+            
+            // Clear custom validity when typing in confirm password
+            document.getElementById('confirm_password').addEventListener('input', function() {
+                this.setCustomValidity('');
+            });
+        }
+    });
+</script>
+{% endblock %}

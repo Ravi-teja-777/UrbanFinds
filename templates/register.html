@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top" style="background-color: #13293d;">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <img src="https://cdn-icons-png.flaticon.com/512/2329/2329140.png" alt="PropertyPro Logo" height="40">
+            PropertyPro
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/about">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/contact">Contact</a>
+                </li>
+            </ul>
+            <div class="d-flex">
+                <a href="/login" class="btn btn-primary me-2">Login</a>
+                <a href="/register" class="btn btn-outline-light active">Register</a>
+            </div>
+        </div>
+    </div>
+</nav>
+<section class="py-5" style="background: linear-gradient(rgba(19, 41, 61, 0.7), rgba(19, 41, 61, 0.7)), 
+                        url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1073&q=80') no-repeat center center; background-size: cover; min-height: 100vh; display: flex; align-items: center;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="feature-box p-4 bg-white">
+                    <div class="text-center mb-4">
+                        <div class="feature-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <h2 class="fw-bold">Create Your PropertyPro Account</h2>
+                        <p class="text-muted">Join our community of property owners and tenants today</p>
+                    </div>
+                    <form method="post" action="{{ url_for('register') }}">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">Full Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                    <input type="text" class="form-control" id="name" name="name" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email address</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                    <input type="password" class="form-control" id="password" name="password" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="confirm_password" class="form-label">Confirm Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                <input type="tel" class="form-control" id="phone" name="phone">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">I am a:</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check feature-box p-3 mb-0 h-100">
+                                        <input class="form-check-input" type="radio" name="role" id="tenant" value="tenant" checked>
+                                        <label class="form-check-label w-100" for="tenant">
+                                            <div class="text-center">
+                                                <div class="mb-2"><i class="fas fa-home fa-2x" style="color: #3e92cc;"></i></div>
+                                                <h5>Tenant</h5>
+                                                <p class="text-muted small mb-0">Looking for a property to rent</p>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check feature-box p-3 mb-0 h-100">
+                                        <input class="form-check-input" type="radio" name="role" id="owner" value="owner">
+                                        <label class="form-check-label w-100" for="owner">
+                                            <div class="text-center">
+                                                <div class="mb-2"><i class="fas fa-building fa-2x" style="color: #3e92cc;"></i></div>
+                                                <h5>Property Owner</h5>
+                                                <p class="text-muted small mb-0">Managing and listing properties</p>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="terms" name="terms" required>
+                            <label class="form-check-label" for="terms">
+                                I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                            </label>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">Create Account</button>
+                        </div>
+                    </form>
+                    <div class="mt-4 text-center">
+                        <p>Already have an account? <a href="{{ url_for('login') }}" class="fw-bold">Login here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

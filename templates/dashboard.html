@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard | Urban Nest{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom Styles */
+        :root {
+            --primary-color: #3e92cc;
+            --secondary-color: #2a628f;
+            --accent-color: #13293d;
+            --light-color: #e8f1f2;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .navbar {
+            background-color: var(--accent-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: white !important;
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-brand img {
+            margin-right: 10px;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.85) !important;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: white !important;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            border-radius: 10px 10px 0 0 !important;
+            padding: 1.25rem;
+            border-bottom: none;
+        }
+        
+        .card-header h4 {
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+        
+        .card-primary .card-header {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .card-info .card-header {
+            background-color: #17a2b8;
+            color: white;
+        }
+        
+        .card-success .card-header {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .card-dark .card-header {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .table {
+            margin-bottom: 0;
+        }
+        
+        .table td, .table th {
+            vertical-align: middle;
+        }
+        
+        .badge {
+            font-weight: 500;
+            padding: 0.4em 0.8em;
+        }
+        
+        .list-group-item {
+            border-left: none;
+            border-right: none;
+            padding: 0.75rem 1.25rem;
+            transition: background-color 0.3s ease;
+        }
+        
+        .list-group-item:first-child {
+            border-top: none;
+        }
+        
+        .list-group-item:last-child {
+            border-bottom: none;
+        }
+        
+        .list-group-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .list-group-item-action {
+            color: #495057;
+        }
+        
+        .alert {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .welcome-banner {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .welcome-banner h1 {
+            margin-bottom: 0;
+            font-weight: 600;
+        }
+        
+        .btn-outline-light:hover {
+            color: var(--primary-color);
+        }
+        
+        .footer {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        .progress {
+            height: 10px;
+            border-radius: 5px;
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        
+        .progress-bar {
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="https://cdn-icons-png.flaticon.com/512/2329/2329140.png" alt="Urban Nest Logo" height="40">
+                Urban Nest
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('list_properties') }}">Properties</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('dashboard') }}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact">Contact</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle me-1"></i> {{ session.name }}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="{{ url_for('profile') }}"><i class="fas fa-user me-2"></i> Profile</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container py-4">
+        <div class="welcome-banner d-flex justify-content-between align-items-center">
+            <div>
+                <h1>Welcome, {{ session.name }}</h1>
+            </div>
+            <div>
+                {% if notifications %}
+                <a href="{{ url_for('notifications') }}" class="btn btn-outline-light position-relative">
+                    <i class="fas fa-bell me-1"></i> Notifications
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        {{ notifications|length }}
+                    </span>
+                </a>
+                {% else %}
+                <a href="{{ url_for('notifications') }}" class="btn btn-outline-light">
+                    <i class="fas fa-bell me-1"></i> Notifications
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Notifications Banner -->
+        {% if notifications %}
+        <div class="alert alert-info alert-dismissible fade show mb-4" role="alert">
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <i class="fas fa-info-circle fa-2x"></i>
+                </div>
+                <div>
+                    <h5 class="mb-1">You have {{ notifications|length }} new notification{% if notifications|length > 1 %}s{% endif %}</h5>
+                    <p class="mb-0">Stay updated with the latest activities related to your properties and applications.</p>
+                </div>
+            </div>
+            <div class="mt-2">
+                <a href="{{ url_for('notifications') }}" class="btn btn-sm btn-primary">View All</a>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Role-specific Dashboard Content -->
+        {% if session.role == 'tenant' %}
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h4><i class="fas fa-home me-2"></i>My Bookings</h4>
+                        </div>
+                        <div class="card-body">
+                            {% if bookings %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Property</th>
+                                                <th>Period</th>
+                                                <th>Monthly Rent</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for booking in bookings %}
+                                            <tr>
+                                                <td>
+                                                    <a href="{{ url_for('view_property', property_id=booking.property_id) }}" class="text-decoration-none fw-bold">
+                                                        {{ booking.property_details.title }}
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    {{ booking.start_date|truncate(10, true, "") }} to 
+                                                    {{ booking.end_date|truncate(10, true, "") }}
+                                                </td>
+                                                <td>${{ booking.monthly_rent }}</td>
+                                                <td>
+                                                    <span class="badge {% if booking.status == 'active' %}bg-success{% elif booking.status == 'pending_payment' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                                        {{ booking.status|replace('_', ' ')|title }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <a href="{{ url_for('view_booking', booking_id=booking.booking_id) }}" class="btn btn-sm btn-primary">
+                                                        <i class="fas fa-eye me-1"></i> View
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <div class="mb-3">
+                                        <i class="fas fa-home fa-3x text-muted"></i>
+                                    </div>
+                                    <h5 class="mb-3">You don't have any active bookings</h5>
+                                    <a href="{{ url_for('list_properties') }}" class="btn btn-primary">
+                                        <i class="fas fa-search me-1"></i> Find Properties
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="card card-info">
+                        <div class="card-header">
+                            <h4><i class="fas fa-file-alt me-2"></i>My Applications</h4>
+                        </div>
+                        <div class="card-body">
+                            {% if applications %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Property</th>
+                                                <th>Applied On</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for application in applications %}
+                                            <tr>
+                                                <td>
+                                                    <a href="{{ url_for('view_property', property_id=application.property_id) }}" class="text-decoration-none fw-bold">
+                                                        {{ application.property_details.title }}
+                                                    </a>
+                                                </td>
+                                                <td>{{ application.created_at|truncate(10, true, "") }}</td>
+                                                <td>
+                                                    <span class="badge {% if application.status == 'approved' %}bg-success{% elif application.status == 'pending' %}bg-warning{% else %}bg-danger{% endif %}">
+                                                        {{ application.status|title }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <a href="{{ url_for('view_application', application_id=application.application_id) }}" class="btn btn-sm btn-primary">
+                                                        <i class="fas fa-eye me-1"></i> View
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <div class="mb-3">
+                                        <i class="fas fa-file-alt fa-3x text-muted"></i>
+                                    </div>
+                                    <h5 class="mb-3">You don't have any property applications</h5>
+                                    <p class="text-muted">When you apply for properties, they will appear here.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <!-- Quick Links -->
+                    <div class="card card-dark">
+                        <div class="card-header">
+                            <h4><i class="fas fa-link me-2"></i>Quick Links</h4>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="list-group list-group-flush">
+                                <a href="{{ url_for('list_properties') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fas fa-search me-2"></i> Browse Properties
+                                    </div>
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                                <a href="{{ url_for('profile') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fas fa-user me-2"></i> My Profile
+                                    </div>
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                                <a href="{{ url_for('notifications') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fas fa-bell me-2"></i> Notifications
+                                    </div>
+                                    <span class="badge bg-primary rounded-pill">{{ notifications|length if notifications else 0 }}</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Property Recommendations -->
+                    <div class="card card-success">
+                        <div class="card-header">
+                            <h4><i class="fas fa-thumbs-up me-2"></i>Recommended Properties</h4>
+                        </div>
+                        <div class="card-body p-0">
+                            {% if recommended_properties %}
+                                <div class="list-group list-group-flush">
+                                    {% for property in recommended_properties %}
+                                    <a href="{{ url_for('view_property', property_id=property.property_id) }}" class="list-group-item list-group-item-action">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h5 class="mb-1">{{ property.title }}</h5>
+                                            <span class="badge bg-primary">${{ property.price }}/month</span>
+                                        </div>
+                                        <p class="mb-1"><i class="fas fa-map-marker-alt me-1"></i> {{ property.location }}</p>
+                                        <small class="text-muted">
+                                            <i class="fas fa-bed me-1"></i> {{ property.bedrooms }} bed
+                                            <i class="fas fa-bath ms-2 me-1"></i> {{ property.bathrooms }} bath
+                                        </small>
+                                    </a>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <div class="mb-3">
+                                        <i class="fas fa-home fa-3x text-muted"></i>
+                                    </div>
+                                    <h5 class="mb-3">No recommendations available</h5>
+                                    <a href="{{ url_for('list_properties') }}" class="btn btn-outline-success">
+                                        <i class="fas fa-search me-1"></i> Browse All Properties
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+        {% elif session.role == 'owner' %}
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h4 class="d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-building me-2"></i>My Properties</span>
+                                <a href="{{ url_for('add_property') }}" class="btn btn-light btn-sm">
+                                    <i class="fas fa-plus-circle me-1"></i> Add New
+                                </a>
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            {% if properties %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Property</th>
+                                                <th>Price</th>
+                                                <th>Status</th>
+                                                <th>Applications</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for property in properties %}
+                                            <tr>
+                                                <td>
+                                                    <a href="{{ url_for('view_property', property_id=property.property_id) }}" class="text-decoration-none fw-bold">
+                                                        {{ property.title }}
+                                                    </a>
+                                                </td>
+                                                <td>${{ property.price }}/month</td>
+                                                <td>
+                                                    <span class="badge {% if property.status == 'available' %}bg-success{% elif property.status == 'leased' %}bg-primary{% else %}bg-secondary{% endif %}">
+                                                        {{ property.status|title }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    {% if property.application_count > 0 %}
+                                                    <span class="badge bg-warning text-dark">{{ property.application_count }}</span>
+                                                    {% else %}
+                                                    <span class="text-muted">0</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group">
+                                                        <a href="{{ url_for('view_property', property_id=property.property_id) }}" class="btn btn-sm btn-primary">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                        <a href="{{ url_for('edit_property', property_id=property.property_id) }}" class="btn btn-sm btn-warning">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="text-end mt-3">
+                                    <a href="{{ url_for('add_property') }}" class="btn btn-success">
+                                        <i class="fas fa-plus-circle me-1"></i> Add New Property
+                                    </a>
+                                </div>
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <div class="mb-3">
+                                        <i class="fas fa-building fa-3x text-muted"></i>
+                                    </div>
+                                    <h5 class="mb-3">You haven't listed any properties yet</h5>
+                                    <a href="{{ url_for('add_property') }}" class="btn btn-primary">
+                                        <i class="fas fa-plus-circle me-1"></i> Add Your First Property
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="card card-info">
+                        <div class="card-header">
+                            <h4><i class="fas fa-file-alt me-2"></i>Property Applications</h4>
+                        </div>
+                        <div class="card-body">
+                            {% if applications %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Property</th>
+                                                <th>Applicant</th>
+                                                <th>Applied On</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for application in applications %}
+                                            <tr>
+                                                <td>
+                                                    <a href="{{ url_for('view_property', property_id=application.property_id) }}" class="text-decoration-none">
+                                                        {{ application.property_details.title }}
+                                                    </a>
+                                                </td>
+                                                <td>{{ application.tenant_name }}</td>
+                                                <td>{{ application.created_at|truncate(10, true, "") }}</td>
+                                                <td>
+                                                    <span class="badge {% if application.status == 'approved' %}bg-success{% elif application.status == 'pending' %}bg-warning{% else %}bg-danger{% endif %}">
+                                                        {{ application.status|title }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <a href="{{ url_for('view_application', application_id=application.application_id) }}" class="btn btn-sm btn-primary">
+                                                        <i class="fas fa-search me-1"></i> Review
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <div class="mb-3">
+                                        <i class="fas fa-file-alt fa-3x text-muted"></i>
+                                    </div>
+                                    <h5 class="mb-3">You don't have any pending applications</h5>
+                                    <p class="text-muted">When tenants apply for your properties, their applications will appear here.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <!-- Quick Links -->
+                    <div class="card card-dark">
+                        <div class="card-header">
+                            <h4><i class="fas fa-link me-2"></i>Quick Links</h4>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="list-group list-group-flush">
+                                <a href="{{ url_for('add_property') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fas fa-plus-circle me-2"></i> Add New Property
+                                    </div>
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                                <a href="{{ url_for('profile') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fas fa-user me-2"></i> My Profile
+                                    </div>
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                                <a href="{{ url_for('notifications') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fas fa-bell me-2"></i> Notifications
+                                    </div>
+                                    <span class="badge bg-primary rounded-pill">{{ notifications|length if notifications else 0 }}</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bookings Summary -->
+                    <div class="card card-success">
+                        <div class="card-header">
+                            <h4><i class="fas fa-check-circle me-2"></i>Active Bookings</h4>
+                        </div>
+                        <div class="card-body p-0">
+                            {% if bookings %}
+                                <div class="list-group list-group-flush">
+                                    {% for booking in bookings %}
+                                    {% if booking.status == 'active' %}
+                                    <a href="{{ url_for('view_booking', booking_id=booking.booking_id) }}" class="list-group-item list-group-item-action">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h5 class="mb-1">{{ booking.property_details.title }}</h5>
+                                            <span class="badge bg-primary">${{ booking.monthly_rent }}/month</span>
+                                        </div>
+                                        <p class="mb-1"><i class="fas fa-user me-1"></i> {{ booking.tenant_name }}</p>
+                                        <small class="text-muted">From: {{ booking.start_date|truncate(10, true, "") }}</small>
+                                    </a>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <div class="mb-3">
+                                        <i class="fas fa-calendar-check fa-3x text-muted"></i>
+                                    </div>
+                                    <h5 class="mb-3">No active bookings at this time</h5>
+                                    <p class="text-muted">When your properties are rented, the bookings will appear here.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Income Summary Card -->
+                    <div class="card card-info">
+                        <div class="card-header">
+                            <h4><i class="fas fa-chart-line me-2"></i>Income Summary</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-center mb-4">
+                                <h3 class="text-success mb-0">${{ monthly_income|default(0) }}</h3>
+                                <p class="text-muted">Monthly Rental Income</p>
+                            </div>
+                            
+                            <div class="progress mb-3">
+                                <div class="progress-bar bg-success occupancy-bar"
+                                    role="progressbar"
+                                    aria-valuenow="{{ occupancy_rate|default(0) }}"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100">
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Properties Rented:</span>
+                                <span class="fw-bold">{{ active_properties|default(0) }}/{{ total_properties|default(0) }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Occupancy Rate:</span>
+                                <span class="fw-bold">{{ occupancy_rate|default(0) }}%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+      {% elif session.role == 'admin' %}
+            <div class="alert alert-info">
+                <div class="d-flex align-items-center">
+                    <div class="me-3">
+                        <i class="fas fa-info-circle fa-2x"></i>
+                    </div>
+                    <div>
+                        <p class="mb-0">This is the user dashboard. For administrative functions, please go to the <a href="{{ url_for('admin_dashboard') }}" class="alert-link">Admin Dashboard</a>.</p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5 class="mb-3">Urban Nest</h5>
+                    <p class="mb-0">Find your perfect urban living space with ease and confidence.</p>
+                </div>
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5 class="mb-3">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/" class="text-white text-decoration-none">Home</a></li>
+                        <li><a href="{{ url_for('list_properties') }}" class="text-white text-decoration-none">Properties</a></li>
+                        <li><a href="{{ url_for('dashboard') }}" class="text-white text-decoration-none">Dashboard</a></li>
+                        <li><a href="/about" class="text-white text-decoration-none">About</a></li>
+                        <li><a href="/contact" class="text-white text-decoration-none">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="mb-3">Contact Us</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-map-marker-alt me-2"></i> 123 Urban Street, City</li>
+                        <li><i class="fas fa-phone me-2"></i> (123) 456-7890</li>
+                        <li><i class="fas fa-envelope me-2"></i> info@urbannest.com</li>
+                    </ul>
+                    <div class="social-icons mt-3">
+                        <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-4 bg-light">
+            <div class="text-center">
+                <p class="mb-0">&copy; 2025 Urban Nest. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Tooltips initialization
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    </script>
+</body>
+</html>

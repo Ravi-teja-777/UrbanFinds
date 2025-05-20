@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - PropertyPro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom Styles */
+        :root {
+            --primary-color: #3e92cc;
+            --secondary-color: #2a628f;
+            --accent-color: #13293d;
+            --light-color: #e8f1f2;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .navbar {
+            background-color: var(--accent-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: white !important;
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-brand img {
+            margin-right: 10px;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.85) !important;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: white !important;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 25px;
+        }
+        
+        .card:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            border-radius: 10px 10px 0 0 !important;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.25rem;
+        }
+        
+        .card-header h2, .card-header h5 {
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+        
+        .dashboard-stat {
+            border-radius: 10px;
+            padding: 20px;
+            height: 100%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .dashboard-stat:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dashboard-stat i {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .dashboard-stat h4 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .dashboard-stat p {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        
+        .section-heading {
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+        
+        .table {
+            margin-bottom: 0;
+        }
+        
+        .table th {
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+        
+        .breadcrumb-item a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .breadcrumb-item a:hover {
+            color: var(--secondary-color);
+            text-decoration: underline;
+        }
+        
+        .footer {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 40px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="https://cdn-icons-png.flaticon.com/512/2329/2329140.png" alt="PropertyPro Logo" height="40">
+                PropertyPro
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/properties">Properties</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact">Contact</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle me-1"></i> John Doe
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2"></i> Profile</a></li>
+                            <li><a class="dropdown-item" href="/dashboard"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Content -->
+    <div class="container py-5">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Admin Dashboard</li>
+            </ol>
+        </nav>
+        
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <h4 class="section-heading">Dashboard Overview</h4>
+                
+                <!-- Stats Overview -->
+                <div class="row mb-4 g-4">
+                    <div class="col-md-3">
+                        <div class="dashboard-stat bg-primary text-white">
+                            <i class="fas fa-users"></i>
+                            <h4>{{ stats.user_count }}</h4>
+                            <p class="mb-0">Total Users</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="dashboard-stat bg-success text-white">
+                            <i class="fas fa-home"></i>
+                            <h4>{{ stats.property_count }}</h4>
+                            <p class="mb-0">Properties</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="dashboard-stat bg-warning text-white">
+                            <i class="fas fa-file-contract"></i>
+                            <h4>{{ stats.booking_count }}</h4>
+                            <p class="mb-0">Bookings</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="dashboard-stat bg-info text-white">
+                            <i class="fas fa-clipboard-list"></i>
+                            <h4>{{ stats.application_count }}</h4>
+                            <p class="mb-0">Applications</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Admin Tools Panel -->
+                <div class="card shadow mb-4">
+                    <div class="card-header">
+                        <h2 class="mb-0">Admin Tools</h2>
+                    </div>
+                    <div class="card-body py-4">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <a href="#" class="btn btn-outline-primary w-100 p-3 d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-users me-2 fa-lg"></i>
+                                    <span class="fw-medium">Manage Users</span>
+                                </a>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ url_for('list_properties') }}" class="btn btn-outline-primary w-100 p-3 d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-home me-2 fa-lg"></i>
+                                    <span class="fw-medium">Manage Properties</span>
+                                </a>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="#" class="btn btn-outline-primary w-100 p-3 d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-file-contract me-2 fa-lg"></i>
+                                    <span class="fw-medium">View All Bookings</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Activities -->
+                <h4 class="section-heading">Recent Activities</h4>
+                <div class="card shadow">
+                    <div class="card-header">
+                        <h2 class="mb-0">Activity Log</h2>
+                    </div>
+                    <div class="card-body">
+                        {% if activities %}
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>User</th>
+                                            <th>Activity</th>
+                                            <th>Details</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for activity in activities %}
+                                            <tr>
+                                                <td>{{ activity.timestamp }}</td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="avatar bg-light rounded-circle p-2 me-2">
+                                                            <i class="fas fa-user text-primary"></i>
+                                                        </div>
+                                                        {{ activity.user_name }}
+                                                    </div>
+                                                </td>
+                                                <td>{{ activity.action }}</td>
+                                                <td>{{ activity.details }}</td>
+                                                <td>
+                                                    {% if activity.status == "completed" %}
+                                                        <span class="badge bg-success">Completed</span>
+                                                    {% elif activity.status == "pending" %}
+                                                        <span class="badge bg-warning">Pending</span>
+                                                    {% elif activity.status == "failed" %}
+                                                        <span class="badge bg-danger">Failed</span>
+                                                    {% else %}
+                                                        <span class="badge bg-secondary">Unknown</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+                                <p class="lead text-muted">No recent activities to display.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5>PropertyPro</h5>
+                    <p>Smart property management solution that connects property owners with tenants and streamlines the entire rental process.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                
+                <div class="col-md-2 col-6 mb-4 mb-md-0">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/about">About</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                        <li><a href="/login">Login</a></li>
+                        <li><a href="/register">Register</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-md-2 col-6 mb-4 mb-md-0">
+                    <h5>For Owners</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#">List Property</a></li>
+                        <li><a href="#">Owner Dashboard</a></li>
+                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#">Resources</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-md-4">
+                    <h5>Contact Us</h5>
+                    <address>
+                        <p><i class="fas fa-map-marker-alt me-2"></i> 123 Property Street, Suite 101<br>San Francisco, CA 94107</p>
+                        <p><i class="fas fa-phone me-2"></i> (123) 456-7890</p>
+                        <p><i class="fas fa-envelope me-2"></i> info@propertypro.com</p>
+                    </address>
+                </div>
+            </div>
+            
+            <hr class="my-4 bg-light">
+            
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0">&copy; 2025 PropertyPro. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="mb-0"><a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

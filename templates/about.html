@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About PropertyPro - Smart Property Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom Styles */
+        :root {
+            --primary-color: #3e92cc;
+            --secondary-color: #2a628f;
+            --accent-color: #13293d;
+            --light-color: #e8f1f2;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .navbar {
+            background-color: var(--accent-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: white !important;
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-brand img {
+            margin-right: 10px;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.85) !important;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: white !important;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .page-header {
+            background: linear-gradient(rgba(19, 41, 61, 0.8), rgba(19, 41, 61, 0.8)), 
+                        url('https://images.unsplash.com/photo-1460317442991-0ec209397118?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80') no-repeat center center;
+            background-size: cover;
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+        
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .about-section {
+            padding: 80px 0;
+        }
+        
+        .mission-box {
+            background-color: white;
+            border-radius: 10px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .team-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease;
+        }
+        
+        .team-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .team-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+        }
+        
+        .timeline {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            background-color: var(--secondary-color);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -3px;
+        }
+        
+        .timeline-item {
+            padding: 10px 40px;
+            position: relative;
+            background-color: inherit;
+            width: 50%;
+        }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            right: -13px;
+            background-color: white;
+            border: 4px solid var(--primary-color);
+            top: 15px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+        
+        .left {
+            left: 0;
+        }
+        
+        .right {
+            left: 50%;
+        }
+        
+        .left::before {
+            content: " ";
+            height: 0;
+            position: absolute;
+            top: 22px;
+            width: 0;
+            z-index: 1;
+            right: 30px;
+            border: medium solid white;
+            border-width: 10px 0 10px 10px;
+            border-color: transparent transparent transparent white;
+        }
+        
+        .right::before {
+            content: " ";
+            height: 0;
+            position: absolute;
+            top: 22px;
+            width: 0;
+            z-index: 1;
+            left: 30px;
+            border: medium solid white;
+            border-width: 10px 10px 10px 0;
+            border-color: transparent white transparent transparent;
+        }
+        
+        .right::after {
+            left: -12px;
+        }
+        
+        .timeline-content {
+            padding: 20px 30px;
+            background-color: white;
+            position: relative;
+            border-radius: 6px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .timeline-icon {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 15px;
+        }
+        
+        @media screen and (max-width: 768px) {
+            .timeline::after {
+                left: 31px;
+            }
+            
+            .timeline-item {
+                width: 100%;
+                padding-left: 70px;
+                padding-right: 25px;
+            }
+            
+            .timeline-item::before {
+                left: 60px;
+                border-width: 10px 10px 10px 0;
+                border-color: transparent white transparent transparent;
+            }
+            
+            .left::after, .right::after {
+                left: 18px;
+            }
+            
+            .right {
+                left: 0%;
+            }
+        }
+        
+        .footer {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 40px 0;
+        }
+        
+        .footer h5 {
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .footer a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            color: white;
+        }
+        
+        .social-icons a {
+            display: inline-block;
+            margin-right: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .testimonial-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .testimonial-img {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+        
+        .property-gallery img {
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            transition: transform 0.3s ease;
+        }
+        
+        .property-gallery img:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Fix for the dark gray backgrounds in vision sections */
+        .vision-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px 5px 0 0;
+            margin-bottom: 0;
+        }
+        
+        .vision-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 0;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+        
+        .vision-content {
+            padding: 20px;
+        }
+        
+        .icon-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="https://cdn-icons-png.flaticon.com/512/2329/2329140.png" alt="PropertyPro Logo" height="40">
+                PropertyPro
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact">Contact</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <a href="/login" class="btn btn-primary me-2">Login</a>
+                    <a href="/register" class="btn btn-outline-light">Register</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="container">
+            <h1>About PropertyPro</h1>
+            <p class="lead">Learn about our mission, team, and the story behind PropertyPro</p>
+        </div>
+    </header>
+
+    <!-- Mission Section -->
+    <section class="about-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1073&q=80" alt="PropertyPro Digital Property Management" class="img-fluid rounded">
+                </div>
+                <div class="col-lg-6">
+                    <div class="mission-box">
+                        <h2 class="mb-4">Our Mission</h2>
+                        <p>At PropertyPro, we believe that property management should be simple, transparent, and efficient. Our mission is to revolutionize the rental industry by providing cutting-edge technology that connects property owners and tenants in a seamless ecosystem.</p>
+                        <p>We strive to eliminate the complexities and frustrations traditionally associated with property rentals by offering a comprehensive platform that handles everything from listings and applications to bookings and payments.</p>
+                        <p>With our innovative approach, we aim to create a world where finding and managing rental properties is stress-free, allowing both property owners and tenants to focus on what truly matters.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Vision Section -->
+    <section class="py-5 bg-light">
+        <div class="container text-center">
+            <h2 class="mb-4">Our Vision</h2>
+            <p class="lead mb-5">To be the leading global platform that transforms property management through technology, creating better rental experiences for everyone.</p>
+            
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="vision-card">
+                        <h4 class="vision-header">Community</h4>
+                        <div class="icon-box">
+                            <i class="fas fa-users fa-3x text-primary mb-3"></i>
+                            <p>Building a trusted community of property owners and tenants who benefit from transparent, reliable rental relationships.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="vision-card">
+                        <h4 class="vision-header">Innovation</h4>
+                        <div class="icon-box">
+                            <i class="fas fa-cogs fa-3x text-primary mb-3"></i>
+                            <p>Continuously improving our platform with cutting-edge technology to solve real-world property management challenges.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="vision-card">
+                        <h4 class="vision-header">Reliability</h4>
+                        <div class="icon-box">
+                            <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
+                            <p>Providing a secure, dependable system that users can count on for their property management needs.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="about-section">
+        <div class="container">
+            <h2 class="text-center mb-5">Meet Our Team</h2>
+            <div class="row">
+                <div class="col-lg-3 col-md-6">
+                    <div class="team-card text-center">
+                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=688&q=80" alt="Jane Smith - CEO & Founder" class="team-img">
+                        <h4>Jane Smith</h4>
+                        <p class="text-muted">CEO & Founder</p>
+                        <p>With 15+ years in real estate and technology, Jane leads PropertyPro's vision and strategy.</p>
+                        <div class="social-icons mt-3">
+                            <a href="#"><i class="fab fa-linkedin"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                    <div class="team-card text-center">
+                        <img src="https://images.unsplash.com/photo-1600878459138-e1123b37cb30?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" alt="Michael Johnson - CTO" class="team-img">
+                        <h4>Michael Johnson</h4>
+                        <p class="text-muted">CTO</p>
+                        <p>Michael oversees all technical aspects of PropertyPro, bringing 12+ years of software development expertise.</p>
+                        <div class="social-icons mt-3">
+                            <a href="#"><i class="fab fa-linkedin"></i></a>
+                            <a href="#"><i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                    <div class="team-card text-center">
+                        <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=761&q=80" alt="Sarah Williams - Head of Operations" class="team-img">
+                        <h4>Sarah Williams</h4>
+                        <p class="text-muted">Head of Operations</p>
+                        <p>Sarah ensures that PropertyPro delivers exceptional service to all users across the platform.</p>
+                        <div class="social-icons mt-3">
+                            <a href="#"><i class="fab fa-linkedin"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                    <div class="team-card text-center">
+                        <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" alt="David Chen - Head of Marketing" class="team-img">
+                        <h4>David Chen</h4>
+                        <p class="text-muted">Head of Marketing</p>
+                        <p>David leads our marketing strategies, bringing properties and people together through targeted campaigns.</p>
+                        <div class="social-icons mt-3">
+                            <a href="#"><i class="fab fa-linkedin"></i></a>
+                            <a href="#"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5">What Our Users Say</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="testimonial-card">
+                        <div class="d-flex align-items-center mb-3">
+                            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Testimonial" class="testimonial-img">
+                            <div>
+                                <h5 class="mb-0">Robert Thompson</h5>
+                                <p class="text-muted mb-0">Property Owner</p>
+                            </div>
+                        </div>
+                        <p>"PropertyPro has completely transformed how I manage my rental properties. The automated payment system alone has saved me countless hours each month."</p>
+                        <div class="text-warning">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-4">
+                    <div class="testimonial-card">
+                        <div class="d-flex align-items-center mb-3">
+                            <img src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80" alt="Testimonial" class="testimonial-img">
+                            <div>
+                                <h5 class="mb-0">Emily Rodriguez</h5>
+                                <p class="text-muted mb-0">Tenant</p>
+                            </div>
+                        </div>
+                        <p>"Finding my apartment through PropertyPro was incredibly simple. I loved being able to schedule viewings directly through the app and communicate with landlords instantly."</p>
+                        <div class="text-warning">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-4">
+                    <div class="testimonial-card">
+                        <div class="d-flex align-items-center mb-3">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" alt="Testimonial" class="testimonial-img">
+                            <div>
+                                <h5 class="mb-0">Marcus Winters</h5>
+                                <p class="text-muted mb-0">Property Manager</p>
+                            </div>
+                        </div>
+                        <p>"As someone who manages over 50 units, PropertyPro's maintenance request system and tenant screening tools have been game-changers for our operational efficiency."</p>
+                        <div class="text-warning">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Property Gallery -->
+    <section class="about-section">
+        <div class="container">
+            <h2 class="text-center mb-5">Featured Properties</h2>
+            <div class="row property-gallery">
+                <div class="col-md-4 col-6">
+                    <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Modern Apartment" class="img-fluid">
+                </div>
+                <div class="col-md-4 col-6">
+                    <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Luxury Home" class="img-fluid">
+                </div>
+                <div class="col-md-4 col-6">
+                    <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1380&q=80" alt="Downtown Condo" class="img-fluid">
+                </div>
+                <div class="col-md-4 col-6">
+                    <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Studio Apartment" class="img-fluid">
+                </div>
+                <div class="col-md-4 col-6">
+                    <img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Suburban House" class="img-fluid">
+                </div>
+                <div class="col-md-4 col-6">
+                    <img src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80" alt="Beachfront Villa" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- History Timeline Section -->
+    <section class="bg-light py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Our Journey</h2>
+            
+            <div class="timeline">
+                <div class="timeline-item left">
+                    <div class="timeline-content">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3281/3281313.png" alt="Founding" class="timeline-icon">
+                        <h4>2020</h4>
+                        <p>PropertyPro was founded with a vision to simplify property management through technology.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item right">
+                    <div class="timeline-content">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1505/1505471.png" alt="Launch" class="timeline-icon">
+                        <h4>2021</h4>
+                        <p>Launched our first beta version with basic property listing and booking features.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item left">
+                    <div class="timeline-content">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3233/3233526.png" alt="Growth" class="timeline-icon">
+                        <h4>2022</h4>
+                        <p>Expanded our team and introduced advanced features including application tracking and tenant screening.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item right">
+                    <div class="timeline-content">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2830/2830284.png" alt="Funding" class="timeline-icon">
+                        <h4>2023</h4>
+                        <p>Secured Series A funding and expanded operations to 10 major cities across the country.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item left">
+                    <div class="timeline-content">
+                        <img src="https://cdn-icons-png.flaticon.com/512/545/545245.png" alt="Mobile" class="timeline-icon">
+                        <h4>2024</h4>
+                        <p>Released our comprehensive mobile app and introduced AI-driven property recommendations.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item right">
+                    <div class="timeline-content">
+                        <img src="https://cdn-icons-png.flaticon.com/512/743/743131.png" alt="Global" class="timeline-icon">
+                        <h4>2025</h4>
+                        <p>Today, PropertyPro serves over 50,000 users, managing more than 15,000 properties nationwide.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mobile App Section (New) continuation -->
+<section class="py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6 mb-4 mb-md-0">
+                <h2 class="mb-4">PropertyPro Mobile App</h2>
+                <p>Take property management with you wherever you go. Our mobile app puts the power of PropertyPro in your pocket.</p>
+                <ul class="list-unstyled mb-4">
+                    <li class="mb-2"><i class="fas fa-check text-primary me-2"></i> Instant notifications for new inquiries</li>
+                    <li class="mb-2"><i class="fas fa-check text-primary me-2"></i> Schedule and manage viewings on the go</li>
+                    <li class="mb-2"><i class="fas fa-check text-primary me-2"></i> Process applications and payments instantly</li>
+                    <li class="mb-2"><i class="fas fa-check text-primary me-2"></i> AI-powered property recommendations</li>
+                </ul>
+                <div class="d-flex">
+                    <a href="#" class="me-3">
+                        <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="App Store" height="50">
+                    </a>
+                    <a href="#">
+                        <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Google Play" height="50">
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="PropertyPro Mobile App" class="img-fluid rounded shadow">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact CTA -->
+<section style="background-color: rgba(19, 41, 61, 0.7); color: white; padding: 3rem 0;">
+    <div class="container text-center">
+        <h2 class="mb-4">Have Questions?</h2>
+        <p class="lead mb-4">Our team is ready to help you get the most out of PropertyPro</p>
+        <a href="/contact" class="btn btn-light btn-lg">Contact Us Today</a>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-4 mb-md-0">
+                <h5>PropertyPro</h5>
+                <p>Revolutionizing property management through innovative technology since 2020.</p>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+            
+            <div class="col-md-2 col-6 mb-4 mb-md-0">
+                <h5>Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/about">About</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                    <li><a href="/login">Login</a></li>
+                    <li><a href="/register">Register</a></li>
+                </ul>
+            </div>
+            
+            <div class="col-md-2 col-6 mb-4 mb-md-0">
+                <h5>For Owners</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#">List Property</a></li>
+                    <li><a href="#">Owner Dashboard</a></li>
+                    <li><a href="#">Pricing</a></li>
+                    <li><a href="#">Resources</a></li>
+                </ul>
+            </div>
+            
+            <div class="col-md-4">
+                <h5>Contact Us</h5>
+                <address>
+                    <p><i class="fas fa-map-marker-alt me-2"></i> 123 Property Street, Suite 101<br>San Francisco, CA 94107</p>
+                    <p><i class="fas fa-phone me-2"></i> (123) 456-7890</p>
+                    <p><i class="fas fa-envelope me-2"></i> info@propertypro.com</p>
+                </address>
+            </div>
+        </div>
+        
+        <hr class="my-4 bg-light">
+        
+        <div class="row">
+            <div class="col-md-6 text-center text-md-start">
+                <p class="mb-0">&copy; 2025 PropertyPro. All rights reserved.</p>
+            </div>
+            <div class="col-md-6 text-center text-md-end">
+                <p class="mb-0"><a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

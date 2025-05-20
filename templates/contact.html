@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - PropertyPro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom Styles */
+        :root {
+            --primary-color: #3e92cc;
+            --secondary-color: #2a628f;
+            --accent-color: #13293d;
+            --light-color: #e8f1f2;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .navbar {
+            background-color: var(--accent-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: white !important;
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-brand img {
+            margin-right: 10px;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.85) !important;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: white !important;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .page-header {
+            background: linear-gradient(rgba(19, 41, 61, 0.7), rgba(19, 41, 61, 0.7)), 
+                        url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1073&q=80') no-repeat center center;
+            background-size: cover;
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+        
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .contact-section {
+            padding: 80px 0;
+        }
+        
+        .contact-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease;
+        }
+        
+        .contact-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .contact-icon {
+            width: 80px;
+            height: 80px;
+            background-color: var(--light-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: var(--primary-color);
+            font-size: 2rem;
+        }
+        
+        .contact-form .form-control {
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .contact-form .form-control:focus {
+            box-shadow: 0 0 0 0.25rem rgba(62, 146, 204, 0.25);
+            border-color: var(--primary-color);
+        }
+        
+        .contact-form textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .contact-form .btn-submit {
+            padding: 12px 30px;
+            font-weight: 600;
+        }
+        
+        .map-container {
+            height: 400px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .faq-section {
+            padding: 80px 0;
+            background-color: var(--light-color);
+        }
+        
+        .faq-item {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .faq-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .faq-header {
+            padding: 20px;
+            background-color: white;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: none;
+            width: 100%;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .faq-body {
+            padding: 0 20px 20px;
+        }
+        
+        .footer {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 40px 0;
+        }
+        
+        .footer h5 {
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .footer a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            color: white;
+        }
+        
+        .social-icons a {
+            display: inline-block;
+            margin-right: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .py-5.bg-primary {
+            background-color: rgba(19, 41, 61, 0.7) !important;
+        }
+        
+        @media (max-width: 768px) {
+            .contact-card {
+                margin-bottom: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="https://cdn-icons-png.flaticon.com/512/2329/2329140.png" alt="PropertyPro Logo" height="40">
+                PropertyPro
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/contact">Contact</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <a href="/login" class="btn btn-primary me-2">Login</a>
+                    <a href="/register" class="btn btn-outline-light">Register</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="container">
+            <h1>Contact Us</h1>
+            <p class="lead">We're here to help with all your property management needs</p>
+        </div>
+    </header>
+
+    <!-- Contact Info Section -->
+    <section class="contact-section">
+        <div class="container">
+            <div class="row text-center mb-5">
+                <div class="col-md-4">
+                    <div class="contact-card">
+                        <div class="contact-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <h4>Our Location</h4>
+                        <p>123 Property Street, Suite 101<br>San Francisco, CA 94107</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="contact-card">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <h4>Phone Number</h4>
+                        <p>Main: (123) 456-7890<br>Support: (123) 456-7891</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="contact-card">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <h4>Email Address</h4>
+                        <p>info@propertypro.com<br>support@propertypro.com</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <div class="contact-card">
+                        <h3 class="mb-4">Send Us a Message</h3>
+                        <form class="contact-form">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control" placeholder="Your Name" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="email" class="form-control" placeholder="Your Email" required>
+                                </div>
+                            </div>
+                            <select class="form-control">
+                                <option selected disabled>Select Inquiry Type</option>
+                                <option>General Inquiry</option>
+                                <option>Property Listing</option>
+                                <option>Technical Support</option>
+                                <option>Billing Question</option>
+                                <option>Partnership Opportunity</option>
+                            </select>
+                            <input type="text" class="form-control" placeholder="Subject">
+                            <textarea class="form-control" placeholder="Your Message" required></textarea>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-submit">Send Message</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6">
+                    <div class="map-container">
+                        <!-- Interactive Map with Geolocation -->
+                        <div id="map" style="width: 100%; height: 100%;"></div>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <h3 class="mb-4">Office Hours</h3>
+                        <div class="row">
+                            <div class="col-6">
+                                <p class="mb-2"><strong>Monday - Friday:</strong></p>
+                                <p class="mb-2"><strong>Saturday:</strong></p>
+                                <p class="mb-2"><strong>Sunday:</strong></p>
+                            </div>
+                            <div class="col-6">
+                                <p class="mb-2">9:00 AM - 6:00 PM</p>
+                                <p class="mb-2">10:00 AM - 4:00 PM</p>
+                                <p class="mb-2">Closed</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <p class="mb-0"><strong>Customer Support:</strong> Available 24/7 via email</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold">Frequently Asked Questions</h2>
+                <p class="text-muted">Find answers to common questions about our services</p>
+            </div>
+            
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="faq-item">
+                        <button class="faq-header" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                            How do I list my property on PropertyPro?
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div id="faq1" class="collapse faq-body">
+                            <p>To list your property, simply create an account, click on "List Property" in your dashboard, and follow the steps to add property details, photos, and pricing. Our team will review your listing within 24 hours.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <button class="faq-header" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                            What fees does PropertyPro charge?
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div id="faq2" class="collapse faq-body">
+                            <p>PropertyPro offers several pricing tiers designed to fit different needs. Our basic plan starts at $29/month per property. For detailed pricing information, please visit our Pricing page or contact our sales team.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <button class="faq-header" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                            How does tenant screening work?
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div id="faq3" class="collapse faq-body">
+                            <p>Our comprehensive tenant screening includes credit checks, background verification, rental history, and income verification. Property owners can customize screening criteria in their dashboard settings.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6">
+                    <div class="faq-item">
+                        <button class="faq-header" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                            Is PropertyPro available in my city?
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div id="faq4" class="collapse faq-body">
+                            <p>PropertyPro is currently available in 50+ cities across the United States. We're rapidly expanding to new locations. Please contact us to check availability in your specific area.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <button class="faq-header" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                            How secure is payment processing?
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div id="faq5" class="collapse faq-body">
+                            <p>We use bank-level security and encryption for all transactions. Our platform is PCI DSS compliant and we never store sensitive payment information on our servers.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <button class="faq-header" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">
+                            Can I try PropertyPro before subscribing?
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div id="faq6" class="collapse faq-body">
+                            <p>Yes! We offer a 14-day free trial with full access to all features. No credit card is required to start your trial. Sign up through our homepage to get started right away.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-5">
+                <p class="mb-4">Don't see your question answered here?</p>
+                <a href="#" class="btn btn-primary">Visit Our Knowledge Base</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-5 bg-primary text-white">
+        <div class="container text-center">
+            <h2 class="fw-bold mb-4">Ready to simplify your property management?</h2>
+            <p class="mb-4">Join thousands of property owners and tenants who are already using PropertyPro.</p>
+            <a href="/register" class="btn btn-light btn-lg">Sign Up Today</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5>PropertyPro</h5>
+                    <p>Smart property management solution that connects property owners with tenants and streamlines the entire rental process.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                
+                <div class="col-md-2 col-6 mb-4 mb-md-0">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/about">About</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                        <li><a href="/login">Login</a></li>
+                        <li><a href="/register">Register</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-md-2 col-6 mb-4 mb-md-0">
+                    <h5>For Owners</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#">List Property</a></li>
+                        <li><a href="#">Owner Dashboard</a></li>
+                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#">Resources</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-md-4">
+                    <h5>Contact Us</h5>
+                    <address>
+                        <p><i class="fas fa-map-marker-alt me-2"></i> 123 Property Street, Suite 101<br>San Francisco, CA 94107</p>
+                        <p><i class="fas fa-phone me-2"></i> (123) 456-7890</p>
+                        <p><i class="fas fa-envelope me-2"></i> info@propertypro.com</p>
+                    </address>
+                </div>
+            </div>
+            
+            <hr class="my-4 bg-light">
+            
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0">&copy; 2025 PropertyPro. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="mb-0"><a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Flash Messages -->
+    <div class="position-fixed top-0 end-0 p-3" style="z-index: 5">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="toast-header {% if category == 'success' %}bg-success text-white{% elif category == 'danger' %}bg-danger text-white{% else %}bg-info text-white{% endif %}">
+                            <strong class="me-auto">PropertyPro</strong>
+                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                        <div class="toast-body">
+                            {{ message }}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Bootstrap JS and Map Script -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Google Maps API (You'll need to replace YOUR_API_KEY with an actual Google Maps API key) -->
+    <script>
+        // Initialize the map
+        function initMap() {
+            // Default location - PropertyPro Office (San Francisco)
+            const propertyProOffice = { lat: 37.7749, lng: -122.4194 };
+            
+            // Create map centered at PropertyPro office
+            const map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 15,
+                center: propertyProOffice,
+                mapTypeControl: true,
+                scrollwheel: false,
+                draggable: true,
+                styles: [
+                    {
+                        "featureType": "administrative",
+                        "elementType": "labels.text.fill",
+                        "stylers": [{"color": "#444444"}]
+                    },
+                    {
+                        "featureType": "landscape",
+                        "elementType": "all",
+                        "stylers": [{"color": "#f2f2f2"}]
+                    },
+                    {
+                        "featureType": "poi",
+                        "elementType": "all",
+                        "stylers": [{"visibility": "off"}]
+                    },
+                    {
+                        "featureType": "road",
+                        "elementType": "all",
+                        "stylers": [{"saturation": -100}, {"lightness": 45}]
+                    },
+                    {
+                        "featureType": "road.highway",
+                        "elementType": "all",
+                        "stylers": [{"visibility": "simplified"}]
+                    },
+                    {
+                        "featureType": "road.arterial",
+                        "elementType": "labels.icon",
+                        "stylers": [{"visibility": "off"}]
+                    },
+                    {
+                        "featureType": "transit",
+                        "elementType": "all",
+                        "stylers": [{"visibility": "off"}]
+                    },
+                    {
+                        "featureType": "water",
+                        "elementType": "all",
+                        "stylers": [{"color": "#3e92cc"}, {"visibility": "on"}]
+                    }
+                ]
+            });
+            
+            // Add marker for PropertyPro office
+            const marker = new google.maps.Marker({
+                position: propertyProOffice,
+                map: map,
+                title: "PropertyPro Office",
+                animation: google.maps.Animation.DROP
+            });
+            
+            // Create info window
+            const infoWindow = new google.maps.InfoWindow({
+                content: `
+                    <div style="width: 250px;">
+                        <h5 style="margin-bottom: 10px; color: #13293d; font-weight: bold;">PropertyPro Headquarters</h5>
+                        <p style="margin-bottom: 5px;">123 Property Street, Suite 101</p>
+                        <p style="margin-bottom: 5px;">San Francisco, CA 94107</p>
+                        <p style="margin-bottom: 5px;"><strong>Phone:</strong> (123) 456-7890</p>
+                        <a href="https://maps.google.com/maps?daddr=37.7749,-122.4194" target="_blank" style="color: #3e92cc; text-decoration: none;">Get Directions</a>
+                    </div>
+                `
+            });
+            
+            // Show info window when marker is clicked
+            marker.addListener("click", () => {
+                infoWindow.open(map, marker);
+            });
+            
+            // Initially open the info window
+            infoWindow.open(map, marker);
+            
+            // Get user's location if permitted
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const userLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        
+                        // Add marker for user's location
+                        const userMarker = new google.maps.Marker({
+                            position: userLocation,
+                            map: map,
+                            title: "Your Location",
+                            icon: {
+                                path: google.maps.SymbolPath.CIRCLE,
+                                scale: 10,
+                                fillColor: "#4285F4",
+                                fillOpacity: 1,
+                                strokeColor: "#ffffff",
+                                strokeWeight: 2
+                            }
+                        });
+                        
+                        // Create directions service
+                        const directionsService = new google.maps.DirectionsService();
+                        const directionsRenderer = new google.maps.DirectionsRenderer({
+                            map: map,
+                            suppressMarkers: true
+                        });
+                        
+                        // Set up directions request
+                        const request = {
+                            origin: userLocation,
+                            destination: propertyProOffice,
+                            travelMode: google.maps.TravelMode.DRIVING
+                        };
+                        
+                        // Get directions
+                        directionsService.route(request, (result, status) => {
+                            if (status == google.maps.DirectionsStatus.OK) {
+                                directionsRenderer.setDirections(result);
+                                
+                                // Calculate distance and time
+                                const route = result.routes[0];
+                                const leg = route.legs[0];
+                                
+                                // Update info window with directions info
+                                infoWindow.setContent(`
+                                    <div style="width: 250px;">
+                                        <h5 style="margin-bottom: 10px; color: #13293d; font-weight: bold;">PropertyPro Headquarters</h5>
+                                        <p style="margin-bottom: 5px;">123 Property Street, Suite 101</p>
+                                        <p style="margin-bottom: 5px;">San Francisco, CA 94107</p>
+                                        <p style="margin-bottom: 5px;"><strong>Phone:</strong> (123) 456-7890</p>
+                                        <hr style="margin: 10px 0;">
+                                        <p style="margin-bottom: 5px;"><strong>Distance:</strong> ${leg.distance.text}</p>
+                                        <p style="margin-bottom: 5px;"><strong>Travel Time:</strong> ${leg.duration.text}</p>
+                                        <a href="https://maps.google.com/maps?daddr=37.7749,-122.4194" target="_blank" style="color: #3e92cc; text-decoration: none;">Get Directions</a>
+                                    </div>
+                                `);
+                            }
+                        });
+                    },
+                    () => {
+                        // Handle geolocation error
+                        console.log("Error: The Geolocation service failed.");
+                    }
+                );
+            }
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
+    
+    <script>
+        // JavaScript to handle accordion toggle icons
+        document.addEventListener('DOMContentLoaded', function() {
+            const faqButtons = document.querySelectorAll('.faq-header');
+            
+            faqButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const icon = this.querySelector('i');
+                    
+                    if (icon.classList.contains('fa-chevron-down')) {
+                        icon.classList.remove('fa-chevron-down');
+                        icon.classList.add('fa-chevron-up');
+                    } else {
+                        icon.classList.remove('fa-chevron-up');
+                        icon.classList.add('fa-chevron-down');
+                    }
+                });
+            });
+            
+            // Close other accordions when one is opened
+            const collapseElements = document.querySelectorAll('.collapse');
+            
+            collapseElements.forEach(collapse => {
+                collapse.addEventListener('show.bs.collapse', function() {
+                    collapseElements.forEach(item => {
+                        if (item !== collapse && item.classList.contains('show')) {
+                            const bsCollapse = new bootstrap.Collapse(item);
+                            bsCollapse.hide();
+                            
+                            // Reset the icon
+                            const button = document.querySelector(`[data-bs-target="#${item.id}"]`);
+                            const icon = button.querySelector('i');
+                            icon.classList.remove('fa-chevron-up');
+                            icon.classList.add('fa-chevron-down');
+                        }
+                    });
+                });
+            });
+            
+            // Auto-dismiss toasts after 5 seconds
+            const toasts = document.querySelectorAll('.toast');
+            toasts.forEach(toast => {
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 5000);
+            });
+        });
+    </script>
+</body>
+</html>
