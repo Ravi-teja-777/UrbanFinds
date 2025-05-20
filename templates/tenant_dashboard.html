@@ -1,276 +1,428 @@
-{% extends "base.html" %}
-
-{% block title %}Tenant Dashboard - Property Rental System{% endblock %}
-
-{% block content %}
-<!-- Sidebar and main content wrapper -->
-<div class="container-fluid">
-    <div class="row">
-        <!-- Sidebar -->
-        <div class="col-lg-2 d-none d-lg-block p-0">
-            <div class="sidebar p-3">
-                <ul class="nav flex-column">
-                    <li class="nav-item mb-2">
-                        <a href="/dashboard" class="nav-link sidebar-link active">
-                            <i class="fas fa-tachometer-alt me-2"></i> Dashboard
-                        </a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tenant Dashboard - PropertyPro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom Styles */
+        :root {
+            --primary-color: #3e92cc;
+            --secondary-color: #2a628f;
+            --accent-color: #13293d;
+            --light-color: #e8f1f2;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .navbar {
+            background-color: var(--accent-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: white !important;
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-brand img {
+            margin-right: 10px;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.85) !important;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: white !important;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 20px;
+        }
+        
+        .card:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            border-radius: 10px 10px 0 0 !important;
+            padding: 1.25rem;
+        }
+        
+        .card-header h5 {
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+        
+        .section-heading {
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .property-img {
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .badge {
+            font-weight: 500;
+            padding: 0.45em 0.75em;
+        }
+        
+        .action-btn {
+            transition: transform 0.2s ease;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-3px);
+        }
+        
+        .footer {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 40px 0;
+        }
+        
+        .footer a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        
+        .footer a:hover {
+            color: white;
+        }
+        
+        .social-icons a {
+            margin-right: 15px;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="https://cdn-icons-png.flaticon.com/512/2329/2329140.png" alt="PropertyPro Logo" height="40">
+                PropertyPro
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
                     </li>
-                    <li class="nav-item mb-2">
-                        <a href="/properties" class="nav-link sidebar-link">
-                            <i class="fas fa-building me-2"></i> Browse Properties
-                        </a>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/properties">Properties</a>
                     </li>
-                    <li class="nav-item mb-2">
-                        <a href="/my-applications" class="nav-link sidebar-link">
-                            <i class="fas fa-file-alt me-2"></i> My Applications
-                        </a>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/dashboard">Dashboard</a>
                     </li>
-                    <li class="nav-item mb-2">
-                        <a href="/my-bookings" class="nav-link sidebar-link">
-                            <i class="fas fa-calendar-check me-2"></i> My Bookings
-                        </a>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">About</a>
                     </li>
-                    <li class="nav-item mb-2">
-                        <a href="/user/profile" class="nav-link sidebar-link">
-                            <i class="fas fa-user-cog me-2"></i> Profile
-                        </a>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact">Contact</a>
                     </li>
                 </ul>
+                <div class="d-flex">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle me-1"></i> John Doe
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2"></i> Profile</a></li>
+                            <li><a class="dropdown-item" href="/dashboard"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Content -->
+    <div class="container py-5">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Tenant Dashboard</li>
+            </ol>
+        </nav>
+        
+        <h1 class="section-heading mb-4">Tenant Dashboard</h1>
+        
+        {% include 'includes/flash_messages.html' %}
+        
+        <div class="row">
+            <!-- Active Bookings -->
+            <div class="col-md-6 mb-4">
+                <div class="card shadow h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0"><i class="fas fa-home me-2"></i> My Active Bookings</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if bookings %}
+                            {% for booking in bookings %}
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            {% if booking.property_details %}
+                                                <a href="{{ url_for('view_property', property_id=booking.property_id) }}">
+                                                    {{ booking.property_details.title }}
+                                                </a>
+                                            {% else %}
+                                                Property #{{ booking.property_id }}
+                                            {% endif %}
+                                        </h5>
+                                        <p class="card-text">
+                                            <span class="badge bg-success text-white mb-2">{{ booking.status|capitalize }}</span><br>
+                                            <i class="fas fa-calendar-alt me-2"></i> <strong>Lease Period:</strong> {{ booking.start_date[:10] }} to {{ booking.end_date[:10] }}<br>
+                                            <i class="fas fa-dollar-sign me-2"></i> <strong>Monthly Rent:</strong> ${{ booking.monthly_rent }}
+                                        </p>
+                                        <a href="{{ url_for('view_booking', booking_id=booking.booking_id) }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye me-1"></i> View Details
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i> You don't have any active bookings.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pending Applications -->
+            <div class="col-md-6 mb-4">
+                <div class="card shadow h-100">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="card-title mb-0"><i class="fas fa-file-alt me-2"></i> My Pending Applications</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if applications %}
+                            {% for application in applications %}
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            {% if application.property_details %}
+                                                <a href="{{ url_for('view_property', property_id=application.property_id) }}">
+                                                    {{ application.property_details.title }}
+                                                </a>
+                                            {% else %}
+                                                Property #{{ application.property_id }}
+                                            {% endif %}
+                                        </h5>
+                                        <p class="card-text">
+                                            <span class="badge bg-warning text-dark mb-2">{{ application.status|capitalize }}</span><br>
+                                            <i class="fas fa-calendar-check me-2"></i> <strong>Applied on:</strong> {{ application.created_at[:10] }}<br>
+                                            <i class="fas fa-calendar-day me-2"></i> <strong>Move-in Date:</strong> {{ application.move_in_date }}
+                                        </p>
+                                        <a href="{{ url_for('view_application', application_id=application.application_id) }}" class="btn btn-sm btn-outline-warning">
+                                            <i class="fas fa-file-alt me-1"></i> View Application
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i> You don't have any pending applications.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         </div>
         
-        <!-- Main Content -->
-        <div class="col-lg-10 p-4">
-            <h2 class="mb-4">Welcome, {{ session.get('name') }}</h2>
-            
-            <!-- Statistics Cards -->
-            <div class="row mb-4">
-                <div class="col-md-3 mb-3">
-                    <div class="card card-stats bg-primary text-white">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h5 class="card-title">Active Bookings</h5>
-                                    <h2 class="display-4">{{ bookings|length if bookings else "0" }}</h2>
-                                </div>
-                                <i class="fas fa-calendar-check fa-3x opacity-50"></i>
-                            </div>
-                        </div>
+        <!-- Quick Actions -->
+        <div class="row mt-2 mb-4">
+            <div class="col-12">
+                <div class="card shadow">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="card-title mb-0"><i class="fas fa-bolt me-2"></i> Quick Actions</h5>
                     </div>
-                </div>
-                
-                <div class="col-md-3 mb-3">
-                    <div class="card card-stats bg-warning text-dark">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h5 class="card-title">Pending Applications</h5>
-                                    <h2 class="display-4">{{ applications|length if applications else "0" }}</h2>
-                                </div>
-                                <i class="fas fa-file-alt fa-3x opacity-50"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-3 mb-3">
-                    <div class="card card-stats bg-success text-white">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h5 class="card-title">Approved Applications</h5>
-                                    <h2 class="display-4">0</h2>
-                                </div>
-                                <i class="fas fa-check-circle fa-3x opacity-50"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-3 mb-3">
-                    <div class="card card-stats bg-danger text-white">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h5 class="card-title">Rejected Applications</h5>
-                                    <h2 class="display-4">0</h2>
-                                </div>
-                                <i class="fas fa-times-circle fa-3x opacity-50"></i>
-                            </div>
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap gap-3">
+                            <a href="{{ url_for('list_properties') }}" class="btn btn-primary action-btn">
+                                <i class="fas fa-search me-2"></i> Browse Properties
+                            </a>
+                            <a href="{{ url_for('profile') }}" class="btn btn-outline-secondary action-btn">
+                                <i class="fas fa-user-edit me-2"></i> Update Profile
+                            </a>
+                            <a href="{{ url_for('contact') }}" class="btn btn-outline-info action-btn">
+                                <i class="fas fa-envelope me-2"></i> Contact Support
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Active Bookings and Applications -->
-            <div class="row">
-                <!-- Active Bookings -->
-                <div class="col-md-6 mb-4">
-                    <div class="card h-100">
-                        <div class="card-header bg-success text-white">
-                            <h5 class="mb-0">My Active Rentals</h5>
-                        </div>
-                        <div class="card-body">
-                            {% if bookings %}
-                                <div id="recent-bookings-list">
-                                    {% for booking in bookings %}
-                                    <div class="activity-item">
-                                        <div class="d-flex justify-content-between">
-                                            <h6>
-                                                <a href="{{ url_for('view_property', property_id=booking.property_id) }}">
-                                                    {{ booking.property_details.title if booking.property_details else "Property" }}
-                                                </a>
-                                            </h6>
-                                            <span class="badge bg-success">{{ booking.status|capitalize }}</span>
-                                        </div>
-                                        <p class="text-muted">{{ booking.start_date }} to {{ booking.end_date }}</p>
-                                        <p class="text-muted"><strong>${{ booking.monthly_rent }}</strong> per month</p>
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                <p class="text-center">You don't have any active rentals.</p>
-                            {% endif %}
-                            <div class="mt-3">
-                                <a href="/my-bookings" class="btn btn-sm btn-outline-success">View All Bookings</a>
-                            </div>
-                        </div>
+        </div>
+        
+        <!-- Recommended Properties -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card shadow">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="card-title mb-0"><i class="fas fa-thumbs-up me-2"></i> Recommended Properties</h5>
                     </div>
-                </div>
-                
-                <!-- Pending Applications -->
-                <div class="col-md-6 mb-4">
-                    <div class="card h-100">
-                        <div class="card-header bg-warning text-dark">
-                            <h5 class="mb-0">My Pending Applications</h5>
-                        </div>
-                        <div class="card-body">
-                            {% if applications %}
-                                <div id="recent-applications-list">
-                                    {% for application in applications %}
-                                    <div class="activity-item">
-                                        <div class="d-flex justify-content-between">
-                                            <h6>
-                                                <a href="{{ url_for('view_property', property_id=application.property_id) }}">
-                                                    {{ application.property_details.title if application.property_details else "Property" }}
-                                                </a>
-                                            </h6>
-                                            <span class="badge bg-warning text-dark">{{ application.status|capitalize }}</span>
-                                        </div>
-                                        <p class="text-muted">Applied: {{ application.created_at }}</p>
-                                        <p class="text-muted">Desired Move-in: {{ application.move_in_date }}</p>
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                <p class="text-center">You don't have any pending applications.</p>
-                            {% endif %}
-                            <div class="mt-3">
-                                <a href="/my-applications" class="btn btn-sm btn-outline-warning">View All Applications</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Recommended Properties -->
-            <div class="row">
-                <div class="col-12 mb-4">
-                    <div class="card">
-                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Recommended Properties</h5>
-                            <a href="/properties" class="btn btn-sm btn-light">View All</a>
-                        </div>
-                        <div class="card-body">
-                            {% if recommended_properties %}
-                                <div class="row">
-                                    {% for property in recommended_properties %}
-                                    <div class="col-md-4 mb-3">
+                    <div class="card-body">
+                        {% if recommended_properties %}
+                            <div class="row">
+                                {% for property in recommended_properties %}
+                                    <div class="col-md-4 mb-4">
                                         <div class="card h-100">
-                                            {% if property.images %}
-                                                <img src="{{ property.images[0] }}" class="card-img-top property-img" alt="{{ property.title }}">
+                                            {% if property.images and property.images|length > 0 %}
+                                                <img src="{{ property.images[0] }}" class="property-img" alt="{{ property.title }}">
                                             {% else %}
-                                                <div class="card-img-top property-img bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
-                                                    <span class="text-white">No Image</span>
+                                                <div class="card-img-top bg-light d-flex justify-content-center align-items-center property-img">
+                                                    <i class="fas fa-home fa-3x text-muted"></i>
                                                 </div>
                                             {% endif %}
                                             <div class="card-body">
                                                 <h5 class="card-title">{{ property.title }}</h5>
-                                                <p class="card-text text-muted">{{ property.location }}</p>
-                                                <p class="card-text"><strong>${{ property.price }}</strong> per month</p>
-                                                <div class="d-flex justify-content-between">
-                                                    <span><i class="fas fa-bed"></i> {{ property.bedrooms }}</span>
-                                                    <span><i class="fas fa-bath"></i> {{ property.bathrooms }}</span>
-                                                    <span><i class="fas fa-ruler-combined"></i> {{ property.area }} sq ft</span>
-                                                </div>
+                                                <p class="card-text">
+                                                    <span class="badge bg-primary text-white mb-2">${{ property.price }}/month</span><br>
+                                                    <i class="fas fa-map-marker-alt me-1"></i> {{ property.location }}<br>
+                                                    <i class="fas fa-building me-1"></i> {{ property.property_type|capitalize }}<br>
+                                                    <i class="fas fa-bed me-1"></i> {{ property.bedrooms }} Beds | 
+                                                    <i class="fas fa-bath me-1"></i> {{ property.bathrooms }} Baths
+                                                </p>
                                             </div>
-                                            <div class="card-footer">
-                                                <a href="{{ url_for('view_property', property_id=property.property_id) }}" class="btn btn-primary btn-sm">View Details</a>
+                                            <div class="card-footer bg-white border-0">
+                                                <div class="d-flex justify-content-between">
+                                                    <a href="{{ url_for('view_property', property_id=property.property_id) }}" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-eye me-1"></i> Details
+                                                    </a>
+                                                    <a href="{{ url_for('apply_for_property', property_id=property.property_id) }}" class="btn btn-sm btn-primary">
+                                                        <i class="fas fa-file-signature me-1"></i> Apply Now
+                                                    </a>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                <p class="text-center">No recommended properties at this time.</p>
-                            {% endif %}
-                        </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i> No recommended properties available at this time.
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-{% endblock %}
 
-{% block extra_styles %}
-<style>
-    .sidebar {
-        min-height: calc(100vh - 56px);
-        background-color: #343a40;
-    }
-    .sidebar-link {
-        color: rgba(255, 255, 255, 0.5);
-        transition: all 0.3s;
-    }
-    .sidebar-link:hover, .sidebar-link.active {
-        color: rgba(255, 255, 255, 0.9);
-        background-color: rgba(255, 255, 255, 0.1);
-    }
-    .card-stats {
-        transition: all 0.3s;
-    }
-    .card-stats:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    .activity-item {
-        border-left: 2px solid #6c757d;
-        padding-left: 20px;
-        margin-bottom: 15px;
-        position: relative;
-    }
-    .activity-item::before {
-        content: '';
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        background-color: #6c757d;
-        position: absolute;
-        left: -7px;
-        top: 0;
-    }
-    .property-img {
-        height: 200px;
-        object-fit: cover;
-    }
-</style>
-{% endblock %}
+    <!-- Footer -->
+    <footer class="footer mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5>PropertyPro</h5>
+                    <p>Smart property management solution that connects property owners with tenants and streamlines the entire rental process.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                
+                <div class="col-md-2 col-6 mb-4 mb-md-0">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/about">About</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                        <li><a href="/login">Login</a></li>
+                        <li><a href="/register">Register</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-md-2 col-6 mb-4 mb-md-0">
+                    <h5>For Tenants</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#">Find Properties</a></li>
+                        <li><a href="#">Tenant Dashboard</a></li>
+                        <li><a href="#">Tenant Resources</a></li>
+                        <li><a href="#">FAQs</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-md-4">
+                    <h5>Contact Us</h5>
+                    <address>
+                        <p><i class="fas fa-map-marker-alt me-2"></i> 123 Property Street, Suite 101<br>San Francisco, CA 94107</p>
+                        <p><i class="fas fa-phone me-2"></i> (123) 456-7890</p>
+                        <p><i class="fas fa-envelope me-2"></i> info@propertypro.com</p>
+                    </address>
+                </div>
+            </div>
+            
+            <hr class="my-4 bg-light">
+            
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0">&copy; 2025 PropertyPro. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="mb-0"><a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+                </div>
+            </div>
+        </div>
+    </footer>
 
-{% block extra_scripts %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Any additional JavaScript can go here
-    });
-</script>
-{% endblock %}
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Highlight the tenant dashboard link in navigation
+            const dashboardLink = document.querySelector('a[href="/dashboard"]');
+            if (dashboardLink) {
+                dashboardLink.classList.add('active');
+            }
+            
+            // Initialize tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+</body>
+</html>
