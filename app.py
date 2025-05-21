@@ -782,8 +782,10 @@ def list_properties():
         flash(f'Error retrieving property listings: {str(e)}', 'danger')
         return render_template('properties.html', properties=[])
 
-@app.route('/properties/<property_id>')
-def view_property(property_id):
+@app.route('/applications/<application_id>', endpoint='view_application_details')
+@login_required
+def view_application(application_id):
+
     try:
         # Get property details
         response = property_table.get_item(Key={'property_id': property_id})
