@@ -1125,10 +1125,20 @@ def apply_property(property_id):
             application_id = str(uuid.uuid4())
             tenant_id = session.get('user_id')
             
+            # Get property owner's ID for notification purposes
+            property_response = property_table.get_item(Key={'property_id': property_id})
+            if 'Item' not in property_response:
+                flash('Property not found', 'danger')
+                return redirect(url_for('list_properties'))
+            
+            property_data = property_response['Item']
+            owner_id = property_data.get('owner_id')
+            
             application_data = {
                 'application_id': application_id,
                 'property_id': property_id,
                 'tenant_id': tenant_id,
+                'owner_id': owner_id,  # Add owner_id to application data
                 'monthly_income': monthly_income,
                 'credit_score': credit_score,
                 'rent_budget': rent_budget,
@@ -1142,6 +1152,28 @@ def apply_property(property_id):
             
             # Save to DynamoDB
             application_table.put_item(Item=application_data)
+            
+            # Send notification to property owner
+            owner_message = f"""
+            You have a new application for {property_data.get('title', 'your property')}!
+            
+            Review it now to:
+            1. Check tenant details
+            2. Verify income and credit information
+            3. Approve or reject the application
+            """
+            
+            # Assuming you have a notification function
+            try:
+                send_notification(
+                    owner_id,
+                    'New Property Application',
+                    owner_message,
+                    {'application_id': application_id}
+                )
+            except Exception as notify_error:
+                logger.error(f"Error sending notification: {notify_error}")
+                # Continue with application submission even if notification fails
             
             flash('Application submitted successfully', 'success')
             return redirect(url_for('view_property', property_id=property_id))
@@ -1161,6 +1193,29 @@ def apply_property(property_id):
             return redirect(url_for('list_properties'))
         
         property_data = response['Item']
+        
+        # Check if user already has an application for this property
+        user_id = session.get('user_id')
+        try:
+            app_response = application_table.query(
+                IndexName='TenantPropertyIndex',
+                KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id').eq(user_id) & 
+                                    boto3.dynamodb.conditions.Key('property_id').eq(property_id)
+            )
+            
+            if app_response.get('Items', []):
+                flash('You have already applied for this property', 'warning')
+                return redirect(url_for('view_property', property_id=property_id))
+                
+        except Exception as query_error:
+            # Log the error but continue to show the form
+            logger.error(f"Error checking existing applications: {query_error}")
+        
+        # Check if property is still available
+        if property_data.get('status') != 'available':
+            flash('This property is no longer available for applications', 'warning')
+            return redirect(url_for('view_property', property_id=property_id))
+        
         return render_template('apply_property.html', property=property_data)
     
     except Exception as e:
