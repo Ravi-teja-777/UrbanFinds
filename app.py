@@ -647,7 +647,6 @@ def owner_dashboard():
                               applications=[],
                               bookings=[])
 
-
 @app.route('/dashboard/tenant')
 @role_required(['tenant'])
 def tenant_dashboard():
@@ -782,6 +781,7 @@ def list_properties():
         logger.error(f"Traceback: {traceback.format_exc()}")
         flash(f'Error retrieving property listings: {str(e)}', 'danger')
         return render_template('properties.html', properties=[])
+
 @app.route('/properties/<property_id>')
 def view_property(property_id):
     try:
@@ -820,6 +820,10 @@ def view_property(property_id):
 
 # Debug add_property function
 from decimal import Decimal
+import os
+from werkzeug.utils import secure_filename
+from datetime import datetime, timedelta
+import uuid
 
 @app.route('/properties/add', methods=['GET', 'POST'])
 @role_required(['owner', 'admin'])
@@ -846,6 +850,11 @@ def add_property():
             # Debug: Log form data to verify what's being submitted
             logger.info(f"Received form data: {request.form}")
             
+            # Ensure upload folder exists
+            uploads_dir = app.config.get('UPLOAD_FOLDER', 'static/uploads')
+            if not os.path.exists(uploads_dir):
+                os.makedirs(uploads_dir)
+            
             # Process image uploads
             images = []
             if 'images' in request.files:
@@ -854,7 +863,7 @@ def add_property():
                     if image.filename:
                         filename = secure_filename(image.filename)
                         unique_filename = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{filename}"
-                        image_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+                        image_path = os.path.join(uploads_dir, unique_filename)
                         image.save(image_path)
                         images.append(f"/static/uploads/{unique_filename}")
             
@@ -946,14 +955,22 @@ def edit_property(property_id):
         
         if request.method == 'POST':
             try:
+                # Ensure upload folder exists
+                uploads_dir = app.config.get('UPLOAD_FOLDER', 'static/uploads')
+                if not os.path.exists(uploads_dir):
+                    os.makedirs(uploads_dir)
+                    
                 # Update property data
                 title = request.form.get('title')
                 description = request.form.get('description')
                 property_type = request.form.get('property_type')
                 bedrooms = int(request.form.get('bedrooms', 0))
-                bathrooms = float(request.form.get('bathrooms', 0))
-                area = float(request.form.get('area', 0))
-                price = float(request.form.get('price', 0))
+                
+                # Convert to Decimal for DynamoDB compatibility
+                bathrooms = Decimal(str(request.form.get('bathrooms', 0)))
+                area = Decimal(str(request.form.get('area', 0)))
+                price = Decimal(str(request.form.get('price', 0)))
+                
                 address = request.form.get('address')
                 city = request.form.get('city')
                 state = request.form.get('state')
@@ -970,13 +987,13 @@ def edit_property(property_id):
                         if image.filename:
                             filename = secure_filename(image.filename)
                             unique_filename = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{filename}"
-                            image_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+                            image_path = os.path.join(uploads_dir, unique_filename)
                             image.save(image_path)
                             existing_images.append(f"/static/uploads/{unique_filename}")
                 
                 # Handle image deletions
                 images_to_keep = request.form.getlist('keep_images')
-                updated_images = [img for img in existing_images if img in images_to_keep]
+                updated_images = [img for img in existing_images if img in images_to_keep] if images_to_keep else existing_images
                 
                 # Update property in DynamoDB
                 update_expression = """
@@ -1080,6 +1097,253 @@ def delete_property(property_id):
         logger.error(f"Delete property error: {e}")
         flash('Error deleting property', 'danger')
         return redirect(url_for('view_property', property_id=property_id))
+
+# --------------------------------------- #
+# Application Management Routes
+# --------------------------------------- #
+@app.route('/properties/<property_id>/apply', methods=['GET', 'POST'])
+@role_required(['tenant'])
+def apply_property(property_id):
+    if request.method == 'POST':
+        try:
+            from decimal import Decimal
+            
+            # Get form data and convert numbers to Decimal
+            # IMPORTANT: Convert to string first to maintain precision
+            monthly_income = Decimal(str(request.form.get('monthly_income', '0')))
+            credit_score = Decimal(str(request.form.get('credit_score', '0')))
+            rent_budget = Decimal(str(request.form.get('rent_budget', '0')))
+            
+            # Get property details to populate owner_id
+            property_response = property_table.get_item(Key={'property_id': property_id})
+            if 'Item' not in property_response:
+                flash('Property not found', 'danger')
+                return redirect(url_for('list_properties'))
+            
+            property_data = property_response['Item']
+            owner_id = property_data.get('owner_id')
+            
+            # Other application data fields...
+            move_in_date = request.form.get('move_in_date')
+            employment_status = request.form.get('employment_status')
+            employment_length = request.form.get('employment_length')
+            additional_notes = request.form.get('additional_notes')
+            
+            # Create application record
+            application_id = str(uuid.uuid4())
+            tenant_id = session.get('user_id')
+            
+            application_data = {
+                'application_id': application_id,
+                'property_id': property_id,
+                'tenant_id': tenant_id,
+                'owner_id': owner_id,  # Add owner_id to the application record
+                'monthly_income': monthly_income,
+                'credit_score': credit_score,
+                'rent_budget': rent_budget,
+                'move_in_date': move_in_date,
+                'employment_status': employment_status,
+                'employment_length': employment_length,
+                'additional_notes': additional_notes,
+                'status': 'pending',
+                'created_at': datetime.now().isoformat()
+            }
+            
+            # Save to DynamoDB
+            application_table.put_item(Item=application_data)
+            
+            flash('Application submitted successfully', 'success')
+            return redirect(url_for('view_property', property_id=property_id))
+            
+        except Exception as e:
+            logger.error(f"Application error: {e}")
+            flash(f'Error submitting application: {str(e)}', 'danger')
+            return redirect(url_for('view_property', property_id=property_id))
+    
+    # GET request handling - show application form
+    try:
+        # Get property details
+        response = property_table.get_item(Key={'property_id': property_id})
+        
+        if 'Item' not in response:
+            flash('Property not found', 'danger')
+            return redirect(url_for('list_properties'))
+        
+        property_data = response['Item']
+        return render_template('apply_property.html', property=property_data)
+    
+    except Exception as e:
+        logger.error(f"Application form error: {e}")
+        flash('Error loading application form', 'danger')
+        return redirect(url_for('view_property', property_id=property_id))
+
+@app.route('/applications/<application_id>')
+@login_required
+def view_application(application_id):
+    try:
+        # Get application details
+        response = application_table.get_item(Key={'application_id': application_id})
+        
+        if 'Item' not in response:
+            flash('Application not found', 'danger')
+            return redirect(url_for('dashboard'))
+        
+        application = response['Item']
+        
+        # Check if user is authorized to view this application
+        user_id = session.get('user_id')
+        user_role = session.get('role')
+        
+        if application['tenant_id'] != user_id and application.get('owner_id') != user_id and user_role != 'admin':
+            flash('You do not have permission to view this application', 'danger')
+            return redirect(url_for('dashboard'))
+        
+        # Get property details
+        property_response = property_table.get_item(Key={'property_id': application['property_id']})
+        property_data = property_response.get('Item', {})
+        
+        # Get tenant details
+        tenant_response = user_table.get_item(Key={'user_id': application['tenant_id']})
+        tenant = tenant_response.get('Item', {})
+        
+        return render_template('application_detail.html', 
+                              application=application,
+                              property=property_data,
+                              tenant=tenant)
+    
+    except Exception as e:
+        logger.error(f"View application error: {e}")
+        flash('Error retrieving application details', 'danger')
+        return redirect(url_for('dashboard'))
+
+@app.route('/applications/<application_id>/update', methods=['POST'])
+@login_required
+def update_application_status(application_id):
+    try:
+        # Get application details
+        response = application_table.get_item(Key={'application_id': application_id})
+        
+        if 'Item' not in response:
+            flash('Application not found', 'danger')
+            return redirect(url_for('dashboard'))
+        
+        application = response['Item']
+        
+        # Check if user is authorized to update this application
+        user_id = session.get('user_id')
+        user_role = session.get('role')
+        
+        if application.get('owner_id') != user_id and user_role != 'admin':
+            flash('You do not have permission to update this application', 'danger')
+            return redirect(url_for('view_application', application_id=application_id))
+        
+        # Update application status
+        new_status = request.form.get('status')
+        notes = request.form.get('notes', '')
+        
+        if new_status not in ['approved', 'rejected']:
+            flash('Invalid status update', 'danger')
+            return redirect(url_for('view_application', application_id=application_id))
+        
+        # Update application in DynamoDB
+        application_table.update_item(
+            Key={'application_id': application_id},
+            UpdateExpression="SET #status = :status, owner_notes = :notes, updated_at = :updated_at",
+            ExpressionAttributeNames={'#status': 'status'},
+            ExpressionAttributeValues={
+                ':status': new_status,
+                ':notes': notes,
+                ':updated_at': datetime.now().isoformat()
+            }
+        )
+        
+        # Get property details for notification
+        property_response = property_table.get_item(Key={'property_id': application['property_id']})
+        property_data = property_response.get('Item', {})
+        
+        # If approved, create booking
+        if new_status == 'approved':
+            # Create booking record
+            booking_id = str(uuid.uuid4())
+            
+            # Calculate lease duration (default to 6 months if not specified)
+            duration = application.get('duration', 6)
+            start_date = datetime.strptime(application['move_in_date'], '%Y-%m-%d')
+            end_date = start_date + timedelta(days=30 * duration)
+            
+            booking_data = {
+                'booking_id': booking_id,
+                'property_id': application['property_id'],
+                'tenant_id': application['tenant_id'],
+                'owner_id': application.get('owner_id'),
+                'start_date': start_date.isoformat(),
+                'end_date': end_date.isoformat(),
+                'monthly_rent': property_data.get('price', 0),
+                'status': 'pending_payment',
+                'created_at': datetime.now().isoformat(),
+                'updated_at': datetime.now().isoformat()
+            }
+            
+            # Save booking to DynamoDB
+            booking_table.put_item(Item=booking_data)
+            
+            # Update property status to 'leased'
+            property_table.update_item(
+                Key={'property_id': application['property_id']},
+                UpdateExpression="SET #status = :status, updated_at = :updated_at",
+                ExpressionAttributeNames={'#status': 'status'},
+                ExpressionAttributeValues={
+                    ':status': 'leased',
+                    ':updated_at': datetime.now().isoformat()
+                }
+            )
+            
+            # Check if send_notification function exists and is defined
+            if 'send_notification' in globals():
+                # Send notification to tenant
+                tenant_message = f"""
+                Your application for {property_data.get('title', 'the property')} has been approved!
+                
+                Next steps:
+                1. Complete the payment process
+                2. Sign the lease agreement
+                3. Arrange for move-in on {application['move_in_date']}
+                
+                Log in to your account to proceed.
+                """
+                
+                send_notification(
+                    application['tenant_id'],
+                    'Application Approved',
+                    tenant_message,
+                    {'booking_id': booking_id, 'application_id': application_id}
+                )
+        else:  # rejected
+            # Check if send_notification function exists and is defined
+            if 'send_notification' in globals():
+                # Send notification to tenant
+                tenant_message = f"""
+                Your application for {property_data.get('title', 'the property')} has been declined.
+                
+                Notes from the owner: {notes}
+                
+                Please continue browsing for other available properties.
+                """
+                
+                send_notification(
+                    application['tenant_id'],
+                    'Application Status Update',
+                    tenant_message,
+                    {'application_id': application_id}
+                )
+        
+        flash(f"Application {new_status} successfully", 'success')
+        return redirect(url_for('view_application', application_id=application_id))
+    
+    except Exception as e:
+        logger.error(f"Update application status error: {e}")
+        flash('Error updating application status', 'danger')
+        return redirect(url_for('view_application', application_id=application_id))
 
 # --------------------------------------- #
 # Application Management Routes
