@@ -820,6 +820,8 @@ def view_property(property_id):
         return redirect(url_for('list_properties'))
 
 # Debug add_property function
+from decimal import Decimal
+
 @app.route('/properties/add', methods=['GET', 'POST'])
 @role_required(['owner', 'admin'])
 def add_property():
@@ -830,9 +832,12 @@ def add_property():
             description = request.form.get('description')
             property_type = request.form.get('property_type')
             bedrooms = int(request.form.get('bedrooms', 0))
-            bathrooms = float(request.form.get('bathrooms', 0))
-            area = float(request.form.get('area', 0))
-            price = float(request.form.get('price', 0))
+            
+            # Convert float values to Decimal for DynamoDB compatibility
+            bathrooms = Decimal(str(request.form.get('bathrooms', 0)))
+            area = Decimal(str(request.form.get('area', 0)))
+            price = Decimal(str(request.form.get('price', 0)))
+            
             address = request.form.get('address')
             city = request.form.get('city')
             state = request.form.get('state')
