@@ -1085,95 +1085,45 @@ def delete_property(property_id):
 # --------------------------------------- #
 # Application Management Routes
 # --------------------------------------- #
-@app.route('/properties/<property_id>/apply', methods=['GET', 'POST'])
-@role_required(['tenant'])
-def apply_for_property(property_id):
-    user_id = session.get('user_id')
-    
-    # Check if user already has an application for this property
+@app.route('/properties/<property_id>/apply', methods=['POST'])
+@login_required
+def apply_property(property_id):
     try:
-        response = application_table.query(
-            IndexName='TenantPropertyIndex',
-            KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id').eq(user_id) & 
-                                   boto3.dynamodb.conditions.Key('property_id').eq(property_id)
-        )
+        # Collect form data
+        # Any numeric fields need to be converted to Decimal, for example:
+        from decimal import Decimal
         
-        if response.get('Items', []):
-            flash('You have already applied for this property', 'warning')
-            return redirect(url_for('view_property', property_id=property_id))
+        # Convert all numeric fields to Decimal
+        monthly_income = Decimal(str(request.form.get('monthly_income', 0)))
+        rent_budget = Decimal(str(request.form.get('rent_budget', 0))) 
+        credit_score = Decimal(str(request.form.get('credit_score', 0)))
+        # Convert any other numeric fields...
         
-        # Get property details
-        property_response = property_table.get_item(Key={'property_id': property_id})
+        # Create application record
+        application_id = str(uuid.uuid4())
+        tenant_id = session.get('user_id')
         
-        if 'Item' not in property_response:
-            flash('Property not found', 'danger')
-            return redirect(url_for('list_properties'))
+        application_data = {
+            'application_id': application_id,
+            'property_id': property_id,
+            'tenant_id': tenant_id,
+            'monthly_income': monthly_income,
+            'rent_budget': rent_budget,
+            'credit_score': credit_score,
+            # Other fields...
+            'status': 'pending',
+            'created_at': datetime.now().isoformat()
+        }
         
-        property_data = property_response['Item']
+        # Save to DynamoDB
+        application_table.put_item(Item=application_data)
         
-        # Check if property is available
-        if property_data['status'] != 'available':
-            flash('This property is no longer available', 'warning')
-            return redirect(url_for('list_properties'))
+        flash('Application submitted successfully', 'success')
+        return redirect(url_for('view_property', property_id=property_id))
         
-        if request.method == 'POST':
-            # Process application form
-            move_in_date = request.form.get('move_in_date')
-            duration = int(request.form.get('duration', 12))  # Lease duration in months
-            monthly_income = float(request.form.get('monthly_income', 0))
-            employment_status = request.form.get('employment_status')
-            employer = request.form.get('employer', '')
-            additional_notes = request.form.get('additional_notes', '')
-            
-            # Create application record
-            application_id = str(uuid.uuid4())
-            
-            application_data = {
-                'application_id': application_id,
-                'property_id': property_id,
-                'tenant_id': user_id,
-                'owner_id': property_data['owner_id'],
-                'move_in_date': move_in_date,
-                'duration': duration,
-                'monthly_income': monthly_income,
-                'employment_status': employment_status,
-                'employer': employer,
-                'additional_notes': additional_notes,
-                'status': 'pending',
-                'created_at': datetime.now().isoformat(),
-                'updated_at': datetime.now().isoformat()
-            }
-            
-            # Save application to DynamoDB
-            application_table.put_item(Item=application_data)
-            
-            # Send notification to property owner
-            owner_message = f"""
-            You received a new application for <strong>{property_data['title']}</strong>.
-
-            <strong>Applicant:</strong> {session.get('name')}<br>
-            <strong>Move-in Date:</strong> {move_in_date}<br>
-            <strong>Duration:</strong> {duration} months<br>
-
-            Visit your dashboard to review this application.
-            """
-
-            
-            send_notification(
-                property_data['owner_id'],
-                'New Application',
-                owner_message,
-                {'application_id': application_id, 'property_id': property_id}
-            )
-            
-            flash('Application submitted successfully', 'success')
-            return redirect(url_for('view_application', application_id=application_id))
-        
-        return render_template('application_form.html', property=property_data)
-    
     except Exception as e:
         logger.error(f"Application error: {e}")
-        flash('Error processing application', 'danger')
+        flash(f'Error submitting application: {str(e)}', 'danger')
         return redirect(url_for('view_property', property_id=property_id))
 
 @app.route('/applications/<application_id>')
