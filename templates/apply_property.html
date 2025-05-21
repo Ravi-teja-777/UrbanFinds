@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Apply for {{ property.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Apply for {{ property.title }}</h3>
+                </div>
+                <div class="card-body">
+                    <div class="property-summary mb-4">
+                        <div class="row">
+                            <div class="col-md-4">
+                                {% if property.images and property.images|length > 0 %}
+                                <img src="{{ property.images[0] }}" alt="{{ property.title }}" class="img-fluid rounded">
+                                {% else %}
+                                <div class="no-image-placeholder rounded" style="height: 120px; background-color: #e9ecef; display: flex; align-items: center; justify-content: center;">
+                                    <span class="text-muted">No image available</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-8">
+                                <h5>{{ property.title }}</h5>
+                                <p class="mb-1"><i class="fas fa-map-marker-alt"></i> {{ property.location }}</p>
+                                <p class="mb-1"><i class="fas fa-bed"></i> {{ property.bedrooms }} bedrooms | <i class="fas fa-bath"></i> {{ property.bathrooms }} bathrooms</p>
+                                <p class="mb-1"><i class="fas fa-dollar-sign"></i> {{ property.price }} per month</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('apply_property', property_id=property.property_id) }}" class="needs-validation" novalidate>
+                        <h4 class="mb-3">Personal Information</h4>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="monthly_income">Monthly Income ($)</label>
+                                <input type="number" class="form-control" id="monthly_income" name="monthly_income" required step="0.01">
+                                <div class="invalid-feedback">
+                                    Please provide your monthly income.
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="credit_score">Credit Score</label>
+                                <input type="number" class="form-control" id="credit_score" name="credit_score" required min="300" max="850">
+                                <div class="invalid-feedback">
+                                    Please provide a valid credit score (300-850).
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="rent_budget">Rent Budget ($)</label>
+                                <input type="number" class="form-control" id="rent_budget" name="rent_budget" required step="0.01">
+                                <div class="invalid-feedback">
+                                    Please provide your rent budget.
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="move_in_date">Preferred Move-in Date</label>
+                                <input type="date" class="form-control" id="move_in_date" name="move_in_date" required min="{{ now.strftime('%Y-%m-%d') }}">
+                                <div class="invalid-feedback">
+                                    Please select a valid move-in date.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="employment_status">Employment Status</label>
+                            <select class="form-control" id="employment_status" name="employment_status" required>
+                                <option value="">Select...</option>
+                                <option value="full_time">Full-time</option>
+                                <option value="part_time">Part-time</option>
+                                <option value="self_employed">Self-employed</option>
+                                <option value="unemployed">Unemployed</option>
+                                <option value="retired">Retired</option>
+                                <option value="student">Student</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Please select your employment status.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="employment_length">Duration of Current Employment</label>
+                            <select class="form-control" id="employment_length" name="employment_length">
+                                <option value="">Select...</option>
+                                <option value="less_than_6_months">Less than 6 months</option>
+                                <option value="6_months_to_1_year">6 months to 1 year</option>
+                                <option value="1_to_3_years">1 to 3 years</option>
+                                <option value="3_to_5_years">3 to 5 years</option>
+                                <option value="more_than_5_years">More than 5 years</option>
+                                <option value="not_applicable">Not applicable</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="additional_notes">Additional Notes or Questions</label>
+                            <textarea class="form-control" id="additional_notes" name="additional_notes" rows="4" placeholder="Include any additional information that may help the owner consider your application..."></textarea>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="terms_agree" required>
+                            <label class="form-check-label" for="terms_agree">
+                                I confirm that all information provided is accurate, and I authorize a background and credit check.
+                            </label>
+                            <div class="invalid-feedback">
+                                You must agree before submitting.
+                            </div>
+                        </div>
+
+                        <hr class="mb-4">
+                        <button class="btn btn-primary btn-lg btn-block" type="submit">Submit Application</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Example starter JavaScript for disabling form submissions if there are invalid fields
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    var forms = document.getElementsByClassName('needs-validation');
+    // Loop over them and prevent submission
+    var validation = Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+</script>
+{% endblock %}
