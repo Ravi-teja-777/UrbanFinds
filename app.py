@@ -782,7 +782,6 @@ def list_properties():
         logger.error(f"Traceback: {traceback.format_exc()}")
         flash(f'Error retrieving property listings: {str(e)}', 'danger')
         return render_template('properties.html', properties=[])
-
 @app.route('/properties/<property_id>')
 def view_property(property_id):
     try:
