@@ -656,11 +656,19 @@ def tenant_dashboard():
     user_name = session.get('user_name', 'Tenant')
     
     try:
-        # Get user's active bookings
-        booking_response = booking_table.query(
-            IndexName='TenantIdIndex',  # Changed from TenantStatusIndex
-            KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id').eq(user_id)
-        )
+        # Get user's active bookings - using scan with filter instead of query
+        try:
+            # Try using the index if it exists
+            booking_response = booking_table.query(
+                IndexName='TenantIdIndex',
+                KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id').eq(user_id)
+            )
+        except Exception as index_error:
+            logger.warning(f"Index error when querying bookings: {index_error}, trying scan instead")
+            # Fall back to scan if index doesn't exist
+            booking_response = booking_table.scan(
+                FilterExpression=boto3.dynamodb.conditions.Attr('tenant_id').eq(user_id)
+            )
         
         bookings = booking_response.get('Items', [])
         active_bookings = [b for b in bookings if b.get('status') == 'active']
@@ -673,11 +681,19 @@ def tenant_dashboard():
             if 'Item' in property_response:
                 booking['property_details'] = property_response['Item']
         
-        # Get user's pending applications
-        application_response = application_table.query(
-            IndexName='TenantIdIndex',  # Changed from TenantStatusIndex
-            KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id').eq(user_id)
-        )
+        # Get user's pending applications - using scan with filter instead of query
+        try:
+            # Try using the index if it exists
+            application_response = application_table.query(
+                IndexName='TenantIdIndex',
+                KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id').eq(user_id)
+            )
+        except Exception as index_error:
+            logger.warning(f"Index error when querying applications: {index_error}, trying scan instead")
+            # Fall back to scan if index doesn't exist
+            application_response = application_table.scan(
+                FilterExpression=boto3.dynamodb.conditions.Attr('tenant_id').eq(user_id)
+            )
         
         applications = application_response.get('Items', [])
         pending_applications = [a for a in applications if a.get('status') == 'pending']
@@ -724,7 +740,6 @@ def tenant_dashboard():
                               applications=[],
                               recommended_properties=[],
                               user_name=user_name)
-
 # --------------------------------------- #
 # Property Management Routes
 # --------------------------------------- #
