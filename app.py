@@ -1085,47 +1085,72 @@ def delete_property(property_id):
 # --------------------------------------- #
 # Application Management Routes
 # --------------------------------------- #
-@app.route('/properties/<property_id>/apply', methods=['POST'])
+@app.route('/properties/<property_id>/apply', methods=['GET', 'POST'])
 @login_required
 def apply_property(property_id):
+    if request.method == 'POST':
+        try:
+            from decimal import Decimal
+            
+            # Get form data and convert numbers to Decimal
+            # IMPORTANT: Convert to string first to maintain precision
+            monthly_income = Decimal(str(request.form.get('monthly_income', '0')))
+            credit_score = Decimal(str(request.form.get('credit_score', '0')))
+            rent_budget = Decimal(str(request.form.get('rent_budget', '0')))
+            # Convert any other numeric fields similarly
+            
+            # Other application data fields...
+            move_in_date = request.form.get('move_in_date')
+            employment_status = request.form.get('employment_status')
+            employment_length = request.form.get('employment_length')
+            additional_notes = request.form.get('additional_notes')
+            
+            # Create application record
+            application_id = str(uuid.uuid4())
+            tenant_id = session.get('user_id')
+            
+            application_data = {
+                'application_id': application_id,
+                'property_id': property_id,
+                'tenant_id': tenant_id,
+                'monthly_income': monthly_income,
+                'credit_score': credit_score,
+                'rent_budget': rent_budget,
+                'move_in_date': move_in_date,
+                'employment_status': employment_status,
+                'employment_length': employment_length,
+                'additional_notes': additional_notes,
+                'status': 'pending',
+                'created_at': datetime.now().isoformat()
+            }
+            
+            # Save to DynamoDB
+            application_table.put_item(Item=application_data)
+            
+            flash('Application submitted successfully', 'success')
+            return redirect(url_for('view_property', property_id=property_id))
+            
+        except Exception as e:
+            logger.error(f"Application error: {e}")
+            flash(f'Error submitting application: {str(e)}', 'danger')
+            return redirect(url_for('view_property', property_id=property_id))
+    
+    # GET request handling - show application form
     try:
-        # Collect form data
-        # Any numeric fields need to be converted to Decimal, for example:
-        from decimal import Decimal
+        # Get property details
+        response = property_table.get_item(Key={'property_id': property_id})
         
-        # Convert all numeric fields to Decimal
-        monthly_income = Decimal(str(request.form.get('monthly_income', 0)))
-        rent_budget = Decimal(str(request.form.get('rent_budget', 0))) 
-        credit_score = Decimal(str(request.form.get('credit_score', 0)))
-        # Convert any other numeric fields...
+        if 'Item' not in response:
+            flash('Property not found', 'danger')
+            return redirect(url_for('list_properties'))
         
-        # Create application record
-        application_id = str(uuid.uuid4())
-        tenant_id = session.get('user_id')
-        
-        application_data = {
-            'application_id': application_id,
-            'property_id': property_id,
-            'tenant_id': tenant_id,
-            'monthly_income': monthly_income,
-            'rent_budget': rent_budget,
-            'credit_score': credit_score,
-            # Other fields...
-            'status': 'pending',
-            'created_at': datetime.now().isoformat()
-        }
-        
-        # Save to DynamoDB
-        application_table.put_item(Item=application_data)
-        
-        flash('Application submitted successfully', 'success')
-        return redirect(url_for('view_property', property_id=property_id))
-        
+        property_data = response['Item']
+        return render_template('apply_property.html', property=property_data)
+    
     except Exception as e:
-        logger.error(f"Application error: {e}")
-        flash(f'Error submitting application: {str(e)}', 'danger')
+        logger.error(f"Application form error: {e}")
+        flash('Error loading application form', 'danger')
         return redirect(url_for('view_property', property_id=property_id))
-
 @app.route('/applications/<application_id>')
 @login_required
 def view_application(application_id):
