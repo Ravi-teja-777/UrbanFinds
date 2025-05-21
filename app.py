@@ -648,66 +648,56 @@ def owner_dashboard():
                               bookings=[])
 
 
+# Dashboard route fix (assuming this is the code causing the error)
 @app.route('/dashboard/tenant')
+@login_required
 @role_required(['tenant'])
 def tenant_dashboard():
-    user_id = session.get('user_id')
-    
     try:
-        # Get user's active bookings
-        booking_response = booking_table.query(
-            IndexName='TenantStatusIndex',
-            KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id').eq(user_id) & 
-                                   boto3.dynamodb.conditions.Key('status').eq('active')
+        user_id = session.get('user_id')
+        
+        # Get user's applications
+        applications_response = application_table.query(
+            IndexName='TenantIdIndex',  # Make sure this index exists
+            KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id').eq(user_id)
         )
+        applications = applications_response.get('Items', [])
         
-        bookings = booking_response.get('Items', [])
+        # Get additional property details for each application
+        for app in applications:
+            try:
+                property_response = property_table.get_item(Key={'property_id': app['property_id']})
+                app['property'] = property_response.get('Item', {})
+            except Exception as prop_error:
+                logger.error(f"Error fetching property for application: {prop_error}")
+                app['property'] = {}
         
-        # Get property details for each booking
+        # Get user's bookings
+        bookings_response = booking_table.query(
+            IndexName='TenantIdIndex',  # Make sure this index exists
+            KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id').eq(user_id)
+        )
+        bookings = bookings_response.get('Items', [])
+        
+        # Get additional property details for each booking
         for booking in bookings:
-            property_response = property_table.get_item(
-                Key={'property_id': booking['property_id']}
-            )
-            if 'Item' in property_response:
-                booking['property_details'] = property_response['Item']
+            try:
+                property_response = property_table.get_item(Key={'property_id': booking['property_id']})
+                booking['property'] = property_response.get('Item', {})
+            except Exception as prop_error:
+                logger.error(f"Error fetching property for booking: {prop_error}")
+                booking['property'] = {}
         
-        # Get user's pending applications
-        application_response = application_table.query(
-            IndexName='TenantStatusIndex',
-            KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id').eq(user_id) & 
-                                   boto3.dynamodb.conditions.Key('status').eq('pending')
-        )
-        
-        applications = application_response.get('Items', [])
-        
-        # Get property details for each application
-        for application in applications:
-            property_response = property_table.get_item(
-                Key={'property_id': application['property_id']}
-            )
-            if 'Item' in property_response:
-                application['property_details'] = property_response['Item']
-        
-        # Get recommended properties (simple recommendation - just get available properties)
-        property_response = property_table.scan(
-            FilterExpression=boto3.dynamodb.conditions.Attr('status').eq('available'),
-            Limit=5
-        )
-        
-        recommended_properties = property_response.get('Items', [])
-        
-        return render_template('tenant_dashboard.html',
-                              bookings=bookings,
+        return render_template('tenant_dashboard.html', 
                               applications=applications,
-                              recommended_properties=recommended_properties)
+                              bookings=bookings)
     
     except Exception as e:
         logger.error(f"Tenant dashboard error: {e}")
-        flash('Error loading dashboard data', 'danger')
-        return render_template('tenant_dashboard.html',
-                              bookings=[],
-                              applications=[],
-                              recommended_properties=[])
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        flash('Error loading dashboard', 'danger')
+        return render_template('tenant_dashboard.html', applications=[], bookings=[])
 
 # --------------------------------------- #
 # Property Management Routes
