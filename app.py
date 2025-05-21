@@ -1150,6 +1150,9 @@ def apply_property(property_id):
             property_data = property_response['Item']
             owner_id = property_data.get('owner_id')
             
+            # Use datetime.datetime.now() instead of just datetime.now()
+            current_time = datetime.datetime.now().isoformat()
+            
             application_data = {
                 'application_id': application_id,
                 'property_id': property_id,
@@ -1163,7 +1166,7 @@ def apply_property(property_id):
                 'employment_length': employment_length,
                 'additional_notes': additional_notes,
                 'status': 'pending',
-                'created_at': datetime.now().isoformat()
+                'created_at': current_time
             }
             
             # Save to DynamoDB
@@ -1196,6 +1199,8 @@ def apply_property(property_id):
             
         except Exception as e:
             logger.error(f"Application error: {e}")
+            import traceback
+            logger.error(f"Application traceback: {traceback.format_exc()}")
             flash(f'Error submitting application: {str(e)}', 'danger')
             return redirect(url_for('view_property', property_id=property_id))
     
@@ -1212,20 +1217,26 @@ def apply_property(property_id):
         
         # Check if user already has an application for this property
         user_id = session.get('user_id')
+        
+        # Try to query using a different index or consider scan if index doesn't exist
         try:
+            # First approach: try with the expected index
             app_response = application_table.query(
                 IndexName='TenantPropertyIndex',
                 KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id').eq(user_id) & 
                                     boto3.dynamodb.conditions.Key('property_id').eq(property_id)
             )
+        except Exception as idx_error:
+            logger.warning(f"Index error, trying scan instead: {idx_error}")
+            # Fallback to scan if index doesn't exist
+            app_response = application_table.scan(
+                FilterExpression=boto3.dynamodb.conditions.Attr('tenant_id').eq(user_id) & 
+                               boto3.dynamodb.conditions.Attr('property_id').eq(property_id)
+            )
             
-            if app_response.get('Items', []):
-                flash('You have already applied for this property', 'warning')
-                return redirect(url_for('view_property', property_id=property_id))
-                
-        except Exception as query_error:
-            # Log the error but continue to show the form
-            logger.error(f"Error checking existing applications: {query_error}")
+        if app_response.get('Items', []):
+            flash('You have already applied for this property', 'warning')
+            return redirect(url_for('view_property', property_id=property_id))
         
         # Check if property is still available
         if property_data.get('status') != 'available':
@@ -1236,6 +1247,8 @@ def apply_property(property_id):
     
     except Exception as e:
         logger.error(f"Application form error: {e}")
+        import traceback
+        logger.error(f"Application form traceback: {traceback.format_exc()}")
         flash('Error loading application form', 'danger')
         return redirect(url_for('view_property', property_id=property_id))
 @app.route('/applications/<application_id>')
