@@ -756,16 +756,14 @@ def list_properties():
         
         # Debug: Log filter parameters
         logger.info(f"Listing properties with filters: min_price={min_price}, max_price={max_price}, "
-                   f"bedrooms={bedrooms}, location={location}, property_type={property_type}")
+                    f"bedrooms={bedrooms}, location={location}, property_type={property_type}")
         
         # Start with basic scan to get all properties
         try:
-            # Simple scan to get all properties first
             scan_response = property_table.scan()
             all_properties = scan_response.get('Items', [])
             logger.info(f"Found {len(all_properties)} total properties in database")
             
-            # Apply filters in Python code to avoid DynamoDB filter complexity
             filtered_properties = []
             
             for prop in all_properties:
@@ -786,7 +784,7 @@ def list_properties():
                 if property_type and prop.get('property_type') != property_type:
                     continue
                 
-                # Only show available properties by default (unless we want to show all statuses)
+                # Only show available properties
                 if prop.get('status') != 'available':
                     continue
                 
@@ -794,12 +792,11 @@ def list_properties():
             
             logger.info(f"After filtering: {len(filtered_properties)} properties")
             
-            # Debug: Log sample property if available
             if filtered_properties:
                 logger.info(f"Sample property: {filtered_properties[0]}")
                 
             return render_template('properties.html', properties=filtered_properties)
-            
+        
         except Exception as scan_error:
             logger.error(f"Error scanning properties: {scan_error}")
             import traceback
@@ -813,6 +810,7 @@ def list_properties():
         logger.error(f"Traceback: {traceback.format_exc()}")
         flash(f'Error retrieving property listings: {str(e)}', 'danger')
         return render_template('properties.html', properties=[])
+
 @app.route('/properties/<property_id>')
 def view_property(property_id):
     try:
