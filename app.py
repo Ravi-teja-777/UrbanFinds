@@ -1103,7 +1103,7 @@ def delete_property(property_id):
 # --------------------------------------- #
 @app.route('/properties/<property_id>/apply', methods=['GET', 'POST'])
 @role_required(['tenant'])
-def apply_property(property_id):
+def apply_for_property(property_id):
     if request.method == 'POST':
         try:
             from decimal import Decimal
