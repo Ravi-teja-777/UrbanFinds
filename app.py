@@ -647,75 +647,76 @@ def owner_dashboard():
                               applications=[],
                               bookings=[])
 
-
 @app.route('/dashboard/tenant')
 @login_required
 @role_required(['tenant'])
 def tenant_dashboard():
     user_id = session.get('user_id')
     user_name = session.get('user_name', 'Tenant')
-    
+
     try:
-        # Get user's active bookings - using scan with filter instead of query
+        # --- Bookings: Try query, fall back to scan ---
         try:
-            # Try using the index if it exists
             booking_response = booking_table.query(
                 IndexName='TenantIdIndex',
-                KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id').eq(user_id)
+                KeyConditionExpression=Key('tenant_id').eq(user_id)
             )
         except Exception as index_error:
             logger.warning(f"Index error when querying bookings: {index_error}, trying scan instead")
-            # Fall back to scan if index doesn't exist
             booking_response = booking_table.scan(
-                FilterExpression=boto3.dynamodb.conditions.Attr('tenant_id').eq(user_id)
+                FilterExpression=Attr('tenant_id').eq(user_id)
             )
-        
+
         bookings = booking_response.get('Items', [])
         active_bookings = [b for b in bookings if b.get('status') == 'active']
-        
-        # Get property details for each booking
-        for booking in active_bookings:
-            property_response = property_table.get_item(
-                Key={'property_id': booking['property_id']}
-            )
-            if 'Item' in property_response:
-                booking['property_details'] = property_response['Item']
-        
-        # Get user's pending applications - using scan with filter instead of query
+        booking_property_ids = {b['property_id'] for b in active_bookings}
+
+        # --- Applications: Try query, fall back to scan ---
         try:
-            # Try using the index if it exists
             application_response = application_table.query(
                 IndexName='TenantIdIndex',
-                KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id').eq(user_id)
+                KeyConditionExpression=Key('tenant_id').eq(user_id)
             )
         except Exception as index_error:
             logger.warning(f"Index error when querying applications: {index_error}, trying scan instead")
-            # Fall back to scan if index doesn't exist
             application_response = application_table.scan(
-                FilterExpression=boto3.dynamodb.conditions.Attr('tenant_id').eq(user_id)
+                FilterExpression=Attr('tenant_id').eq(user_id)
             )
-        
+
         applications = application_response.get('Items', [])
         pending_applications = [a for a in applications if a.get('status') == 'pending']
-        
-        # Get property details for each application
-        for application in pending_applications:
-            property_response = property_table.get_item(
-                Key={'property_id': application['property_id']}
+        application_property_ids = {a['property_id'] for a in pending_applications}
+
+        # --- Batch get all relevant property details ---
+        all_property_ids = list(booking_property_ids.union(application_property_ids))
+        property_details_map = {}
+
+        if all_property_ids:
+            keys = [{'property_id': pid} for pid in all_property_ids]
+            response = dynamodb.batch_get_item(
+                RequestItems={
+                    property_table.name: {
+                        'Keys': keys
+                    }
+                }
             )
-            if 'Item' in property_response:
-                application['property_details'] = property_response['Item']
-        
-        # Get recommended properties (simple recommendation - just get available properties)
+            for item in response['Responses'].get(property_table.name, []):
+                property_details_map[item['property_id']] = item
+
+        # Attach property details to bookings and applications
+        for b in active_bookings:
+            b['property_details'] = property_details_map.get(b['property_id'], {})
+
+        for a in pending_applications:
+            a['property_details'] = property_details_map.get(a['property_id'], {})
+
+        # --- Recommended properties (available ones) ---
         property_response = property_table.scan(
-            FilterExpression=boto3.dynamodb.conditions.Attr('status').eq('available'),
+            FilterExpression=Attr('status').eq('available'),
             Limit=5
         )
-        
         recommended_properties = property_response.get('Items', [])
-        
-        # Handle any Decimal objects for better JSON serialization
-        # This prevents display issues in the template
+
         for prop in recommended_properties:
             if 'price' in prop and isinstance(prop['price'], Decimal):
                 prop['price'] = float(prop['price'])
@@ -723,23 +724,22 @@ def tenant_dashboard():
                 prop['bedrooms'] = int(prop['bedrooms'])
             if 'bathrooms' in prop and isinstance(prop['bathrooms'], Decimal):
                 prop['bathrooms'] = int(prop['bathrooms'])
-        
+
         return render_template('tenant_dashboard.html',
-                              bookings=active_bookings,
-                              applications=pending_applications,
-                              recommended_properties=recommended_properties,
-                              user_name=user_name)
-    
+                               bookings=active_bookings,
+                               applications=pending_applications,
+                               recommended_properties=recommended_properties,
+                               user_name=user_name)
+
     except Exception as e:
         logger.error(f"Tenant dashboard error: {e}")
         import traceback
         logger.error(f"Traceback: {traceback.format_exc()}")
         flash('Error loading dashboard data', 'danger')
         return render_template('tenant_dashboard.html',
-                              bookings=[],
-                              applications=[],
-                              recommended_properties=[],
-                              user_name=user_name)
+                               bookings=[],
+                               applications=[],
+                               recommended_properties=[],
 # --------------------------------------- #
 # Property Management Routes
 # --------------------------------------- #
