@@ -95,8 +95,9 @@ def hash_password(password):
     return bcrypt.hashpw(password.encode('utf-8'), salt)
 
 def verify_password(stored_password, provided_password):
-    """Verify a stored password against one provided by user"""
-    return bcrypt.checkpw(provided_password.encode('utf-8'), stored_password.encode('utf-8'))
+    if isinstance(stored_password, str):
+        stored_password = stored_password.encode('utf-8')
+    return bcrypt.checkpw(provided_password.encode('utf-8'), stored_password)
 
 def generate_random_id(prefix='', length=8):
     """Generate a random ID with optional prefix"""
@@ -567,35 +568,69 @@ def owner_dashboard():
     user_id = session.get('user_id')
     
     try:
-        # Get properties owned by this user
-        response = property_table.query(
-            IndexName='OwnerIndex',
-            KeyConditionExpression=boto3.dynamodb.conditions.Key('owner_id').eq(user_id)
-        )
+        logger.info(f"Loading owner dashboard for user: {user_id}")
         
-        properties = response.get('Items', [])
+        # Use scan instead of relying on the index
+        # This is more reliable as it ensures we find all properties regardless of index issues
+        try:
+            scan_response = property_table.scan(
+                FilterExpression=boto3.dynamodb.conditions.Attr('owner_id').eq(user_id)
+            )
+            properties = scan_response.get('Items', [])
+            logger.info(f"Found {len(properties)} properties via scan for owner {user_id}")
+            
+            # Debug: Log found properties
+            if properties:
+                property_ids = [prop['property_id'] for prop in properties]
+                logger.info(f"Property IDs found: {property_ids}")
+            else:
+                logger.warning(f"No properties found for owner {user_id}")
+                
+        except Exception as scan_error:
+            logger.error(f"Property scan error: {scan_error}")
+            properties = []
+            property_ids = []
         
         # Get pending applications for owner's properties
-        property_ids = [prop['property_id'] for prop in properties]
-        
         applications = []
-        for prop_id in property_ids:
-            response = application_table.query(
-                IndexName='PropertyStatusIndex',
-                KeyConditionExpression=boto3.dynamodb.conditions.Key('property_id').eq(prop_id) & 
-                                       boto3.dynamodb.conditions.Key('status').eq('pending')
-            )
-            applications.extend(response.get('Items', []))
+        if properties:  # Only try to get applications if we found properties
+            try:
+                property_ids = [prop['property_id'] for prop in properties]
+                for prop_id in property_ids:
+                    try:
+                        response = application_table.query(
+                            IndexName='PropertyStatusIndex',
+                            KeyConditionExpression=boto3.dynamodb.conditions.Key('property_id').eq(prop_id) & 
+                                                   boto3.dynamodb.conditions.Key('status').eq('pending')
+                        )
+                        applications.extend(response.get('Items', []))
+                    except Exception as app_error:
+                        logger.error(f"Application query error for property {prop_id}: {app_error}")
+                
+                logger.info(f"Found {len(applications)} pending applications")
+            except Exception as apps_error:
+                logger.error(f"Applications processing error: {apps_error}")
+                applications = []
         
         # Get active bookings for owner's properties
         bookings = []
-        for prop_id in property_ids:
-            response = booking_table.query(
-                IndexName='PropertyStatusIndex',
-                KeyConditionExpression=boto3.dynamodb.conditions.Key('property_id').eq(prop_id) & 
-                                       boto3.dynamodb.conditions.Key('status').eq('active')
-            )
-            bookings.extend(response.get('Items', []))
+        if properties:  # Only try to get bookings if we found properties
+            try:
+                for prop_id in property_ids:
+                    try:
+                        response = booking_table.query(
+                            IndexName='PropertyStatusIndex',
+                            KeyConditionExpression=boto3.dynamodb.conditions.Key('property_id').eq(prop_id) & 
+                                                   boto3.dynamodb.conditions.Key('status').eq('active')
+                        )
+                        bookings.extend(response.get('Items', []))
+                    except Exception as book_error:
+                        logger.error(f"Booking query error for property {prop_id}: {book_error}")
+                
+                logger.info(f"Found {len(bookings)} active bookings")
+            except Exception as books_error:
+                logger.error(f"Bookings processing error: {books_error}")
+                bookings = []
         
         return render_template('owner_dashboard.html', 
                               properties=properties,
@@ -604,11 +639,14 @@ def owner_dashboard():
     
     except Exception as e:
         logger.error(f"Owner dashboard error: {e}")
-        flash('Error loading dashboard data', 'danger')
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        flash(f'Error loading dashboard data: {str(e)}', 'danger')
         return render_template('owner_dashboard.html', 
                               properties=[],
                               applications=[],
                               bookings=[])
+
 
 @app.route('/dashboard/tenant')
 @role_required(['tenant'])
@@ -685,35 +723,64 @@ def list_properties():
         location = request.args.get('location', '')
         property_type = request.args.get('property_type', '')
         
-        # Base scan parameters
-        scan_params = {
-            'FilterExpression': boto3.dynamodb.conditions.Attr('status').eq('available')
-        }
+        # Debug: Log filter parameters
+        logger.info(f"Listing properties with filters: min_price={min_price}, max_price={max_price}, "
+                   f"bedrooms={bedrooms}, location={location}, property_type={property_type}")
         
-        # Add price filter
-        scan_params['FilterExpression'] &= boto3.dynamodb.conditions.Attr('price').between(min_price, max_price)
-        
-        # Add bedrooms filter if specified
-        if bedrooms:
-            scan_params['FilterExpression'] &= boto3.dynamodb.conditions.Attr('bedrooms').eq(int(bedrooms))
-        
-        # Add location filter if specified
-        if location:
-            scan_params['FilterExpression'] &= boto3.dynamodb.conditions.Attr('location').contains(location)
-        
-        # Add property type filter if specified
-        if property_type:
-            scan_params['FilterExpression'] &= boto3.dynamodb.conditions.Attr('property_type').eq(property_type)
-        
-        # Execute the scan
-        response = property_table.scan(**scan_params)
-        properties = response.get('Items', [])
-        
-        return render_template('properties.html', properties=properties)
+        # Start with basic scan to get all properties
+        try:
+            # Simple scan to get all properties first
+            scan_response = property_table.scan()
+            all_properties = scan_response.get('Items', [])
+            logger.info(f"Found {len(all_properties)} total properties in database")
+            
+            # Apply filters in Python code to avoid DynamoDB filter complexity
+            filtered_properties = []
+            
+            for prop in all_properties:
+                # Apply price filter
+                price = float(prop.get('price', 0))
+                if price < min_price or price > max_price:
+                    continue
+                
+                # Apply bedrooms filter if specified
+                if bedrooms and int(prop.get('bedrooms', 0)) != int(bedrooms):
+                    continue
+                
+                # Apply location filter if specified
+                if location and location.lower() not in prop.get('location', '').lower():
+                    continue
+                
+                # Apply property type filter if specified
+                if property_type and prop.get('property_type') != property_type:
+                    continue
+                
+                # Only show available properties by default (unless we want to show all statuses)
+                if prop.get('status') != 'available':
+                    continue
+                
+                filtered_properties.append(prop)
+            
+            logger.info(f"After filtering: {len(filtered_properties)} properties")
+            
+            # Debug: Log sample property if available
+            if filtered_properties:
+                logger.info(f"Sample property: {filtered_properties[0]}")
+                
+            return render_template('properties.html', properties=filtered_properties)
+            
+        except Exception as scan_error:
+            logger.error(f"Error scanning properties: {scan_error}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            flash('Error retrieving property listings', 'danger')
+            return render_template('properties.html', properties=[])
         
     except Exception as e:
         logger.error(f"Property listing error: {e}")
-        flash('Error retrieving property listings', 'danger')
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        flash(f'Error retrieving property listings: {str(e)}', 'danger')
         return render_template('properties.html', properties=[])
 
 @app.route('/properties/<property_id>')
@@ -752,6 +819,7 @@ def view_property(property_id):
         flash('Error retrieving property details', 'danger')
         return redirect(url_for('list_properties'))
 
+# Debug add_property function
 @app.route('/properties/add', methods=['GET', 'POST'])
 @role_required(['owner', 'admin'])
 def add_property():
@@ -771,6 +839,9 @@ def add_property():
             zipcode = request.form.get('zipcode')
             amenities = request.form.getlist('amenities')
             
+            # Debug: Log form data to verify what's being submitted
+            logger.info(f"Received form data: {request.form}")
+            
             # Process image uploads
             images = []
             if 'images' in request.files:
@@ -786,6 +857,9 @@ def add_property():
             # Create property record
             property_id = str(uuid.uuid4())
             owner_id = session.get('user_id')
+            
+            # Debug: Log current user
+            logger.info(f"Current user ID: {owner_id}")
             
             property_data = {
                 'property_id': property_id,
@@ -809,15 +883,38 @@ def add_property():
                 'updated_at': datetime.now().isoformat()
             }
             
-            # Save to DynamoDB
-            property_table.put_item(Item=property_data)
+            # Debug: Log property data before saving
+            logger.info(f"Property data to save: {property_data}")
+            
+            try:
+                # Save to DynamoDB
+                property_table.put_item(Item=property_data)
+                logger.info(f"Property saved successfully with ID: {property_id}")
+            except Exception as db_error:
+                # Debug: Log DynamoDB errors separately
+                logger.error(f"DynamoDB error: {db_error}")
+                raise
+            
+            # Verify property was added by retrieving it
+            try:
+                verification = property_table.get_item(Key={'property_id': property_id})
+                if 'Item' in verification:
+                    logger.info("Property verification successful")
+                else:
+                    logger.error("Property verification failed - item not found")
+            except Exception as verify_error:
+                logger.error(f"Property verification error: {verify_error}")
             
             flash('Property added successfully', 'success')
             return redirect(url_for('view_property', property_id=property_id))
             
         except Exception as e:
+            # Provide more detailed error information
             logger.error(f"Add property error: {e}")
-            flash('Error adding property', 'danger')
+            logger.error(f"Error details: {str(e)}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            flash(f'Error adding property: {str(e)}', 'danger')
             return render_template('add_property.html')
     
     return render_template('add_property.html')
@@ -1047,14 +1144,15 @@ def apply_for_property(property_id):
             
             # Send notification to property owner
             owner_message = f"""
-            New application received for your property: {property_data['title']}
-            
-            Applicant: {session.get('name')}
-            Move-in Date: {move_in_date}
-            Lease Duration: {duration} months
-            
-            Log in to review the application.
+            You received a new application for <strong>{property_data['title']}</strong>.
+
+            <strong>Applicant:</strong> {session.get('name')}<br>
+            <strong>Move-in Date:</strong> {move_in_date}<br>
+            <strong>Duration:</strong> {duration} months<br>
+
+            Visit your dashboard to review this application.
             """
+
             
             send_notification(
                 property_data['owner_id'],
@@ -1518,13 +1616,16 @@ def admin_edit_user(user_id):
             
             # Update user in DynamoDB
             update_expression = """
-            SET #name = :name, 
-                #email = :email,
-                #phone = :phone,
-                #role = :role,
-                #status = :status,
-                updated_at = :updated_at
-            """
+                 SET #name = :name,
+                    #email = :email,
+                    #phone = :phone,
+                    #role = :role,
+                    #status = :status,
+                    updated_at = :updated_at
+                """
+            
+
+
             
             expression_attribute_names = {
                 '#name': 'name',
@@ -1559,6 +1660,10 @@ def admin_edit_user(user_id):
         logger.error(f"Admin edit user error: {e}")
         flash('Error updating user', 'danger')
         return redirect(url_for('admin_view_user', user_id=user_id))
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/admin/properties')
 @role_required(['admin'])
