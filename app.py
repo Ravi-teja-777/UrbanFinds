@@ -801,17 +801,34 @@ def view_property(property_id):
         # Check if current user has an active application for this property
         has_application = False
         if 'user_id' in session:
-            app_response = application_table.query(
-                IndexName='TenantPropertyIndex',
-                KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id').eq(session['user_id']) & 
-                                       boto3.dynamodb.conditions.Key('property_id').eq(property_id)
-            )
-            has_application = len(app_response.get('Items', [])) > 0
+            try:
+                app_response = application_table.query(
+                    IndexName='TenantPropertyIndex',
+                    KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id').eq(session['user_id']) & 
+                                        boto3.dynamodb.conditions.Key('property_id').eq(property_id)
+                )
+                has_application = len(app_response.get('Items', [])) > 0
+            except Exception as app_error:
+                logger.error(f"Error checking applications: {app_error}")
+                has_application = False
         
-        return render_template('property_detail.html', 
-                              property=property_data, 
-                              owner=owner,
-                              has_application=has_application)
+        # Check if templates exist before rendering
+        try:
+            return render_template('property_detail.html', 
+                                property=property_data, 
+                                owner=owner,
+                                has_application=has_application)
+        except Exception as template_error:
+            logger.error(f"Template error: {template_error}")
+            flash(f'Error loading property template: {str(template_error)}', 'danger')
+            return redirect(url_for('list_properties'))
+    
+    except Exception as e:
+        logger.error(f"View property error: {e}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        flash('Error retrieving property details', 'danger')
+        return redirect(url_for('list_properties'))
     
     except Exception as e:
         logger.error(f"View property error: {e}")
