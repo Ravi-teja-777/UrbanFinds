@@ -1,221 +1,172 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Property Details - {{ property.title }}</title>
-    
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
-    
-    <style>
-        body {
-            padding-top: 20px;
-            background-color: #f8f9fa;
-        }
-        
-        .property-image {
-            height: 300px;
-            object-fit: cover;
-        }
-    </style>
-</head>
-<body>
-    <div class="container mt-4">
-        <!-- Flash Messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h2>{{ property.title }}</h2>
+                    <p class="text-muted">{{ property.location }}</p>
+                </div>
+                
+                <!-- Property Images -->
+                {% if property.images %}
+                <div id="propertyCarousel" class="carousel slide" data-ride="carousel">
+                    <div class="carousel-inner">
+                        {% for image in property.images %}
+                        <div class="carousel-item {% if loop.first %}active{% endif %}">
+                            <img src="{{ image }}" class="d-block w-100 property-image" alt="Property Image">
+                        </div>
+                        {% endfor %}
                     </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        
-        <!-- Navigation Links -->
-        <div class="mb-4">
-            <a href="{{ url_for('list_properties') }}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left mr-1"></i> Back to Properties
-            </a>
-            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary ml-2">
-                <i class="fas fa-tachometer-alt mr-1"></i> Dashboard
-            </a>
-        </div>
-        
-        <div class="row">
-            <div class="col-md-8">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h2>{{ property.title }}</h2>
-                        <p class="text-muted">{{ property.location }}</p>
+                    <a class="carousel-control-prev" href="#propertyCarousel" role="button" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="carousel-control-next" href="#propertyCarousel" role="button" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </div>
+                {% else %}
+                <div class="text-center py-5 bg-light">
+                    <i class="fas fa-home fa-4x text-muted"></i>
+                    <p class="mt-3">No images available</p>
+                </div>
+                {% endif %}
+                
+                <div class="card-body">
+                    <!-- Property Details -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <p><i class="fas fa-dollar-sign mr-2"></i> <strong>Price:</strong> ${{ property.price }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><i class="fas fa-bed mr-2"></i> <strong>Bedrooms:</strong> {{ property.bedrooms }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><i class="fas fa-bath mr-2"></i> <strong>Bathrooms:</strong> {{ property.bathrooms }}</p>
+                        </div>
                     </div>
                     
-                    <!-- Property Images -->
-                    {% if property.images %}
-                    <div id="propertyCarousel" class="carousel slide" data-ride="carousel">
-                        <div class="carousel-inner">
-                            {% for image in property.images %}
-                            <div class="carousel-item {% if loop.first %}active{% endif %}">
-                                <img src="{{ image }}" class="d-block w-100 property-image" alt="Property Image">
-                            </div>
-                            {% endfor %}
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <p><i class="fas fa-ruler-combined mr-2"></i> <strong>Area:</strong> {{ property.area }} sq ft</p>
                         </div>
-                        <a class="carousel-control-prev" href="#propertyCarousel" role="button" data-slide="prev">
-                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                            <span class="sr-only">Previous</span>
-                        </a>
-                        <a class="carousel-control-next" href="#propertyCarousel" role="button" data-slide="next">
-                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                            <span class="sr-only">Next</span>
-                        </a>
+                        <div class="col-md-6">
+                            <p><i class="fas fa-building mr-2"></i> <strong>Type:</strong> {{ property.property_type|title }}</p>
+                        </div>
                     </div>
-                    {% else %}
-                    <div class="text-center py-5 bg-light">
-                        <i class="fas fa-home fa-4x text-muted"></i>
-                        <p class="mt-3">No images available</p>
+                    
+                    <h4>Description</h4>
+                    <p>{{ property.description }}</p>
+                    
+                    {% if property.amenities %}
+                    <h4>Amenities</h4>
+                    <div class="row">
+                        {% for amenity in property.amenities %}
+                        <div class="col-md-4 mb-2">
+                            <span class="badge badge-primary p-2">{{ amenity|title }}</span>
+                        </div>
+                        {% endfor %}
                     </div>
                     {% endif %}
                     
-                    <div class="card-body">
-                        <!-- Property Details -->
-                        <div class="row mb-4">
-                            <div class="col-md-4">
-                                <p><i class="fas fa-dollar-sign mr-2"></i> <strong>Price:</strong> ${{ property.price }}</p>
-                            </div>
-                            <div class="col-md-4">
-                                <p><i class="fas fa-bed mr-2"></i> <strong>Bedrooms:</strong> {{ property.bedrooms }}</p>
-                            </div>
-                            <div class="col-md-4">
-                                <p><i class="fas fa-bath mr-2"></i> <strong>Bathrooms:</strong> {{ property.bathrooms }}</p>
-                            </div>
-                        </div>
-                        
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <p><i class="fas fa-ruler-combined mr-2"></i> <strong>Area:</strong> {{ property.area }} sq ft</p>
-                            </div>
-                            <div class="col-md-6">
-                                <p><i class="fas fa-building mr-2"></i> <strong>Type:</strong> {{ property.property_type|title }}</p>
-                            </div>
-                        </div>
-                        
-                        <h4>Description</h4>
-                        <p>{{ property.description }}</p>
-                        
-                        {% if property.amenities %}
-                        <h4>Amenities</h4>
-                        <div class="row">
-                            {% for amenity in property.amenities %}
-                            <div class="col-md-4 mb-2">
-                                <span class="badge badge-primary p-2">{{ amenity|title }}</span>
-                            </div>
-                            {% endfor %}
+                    <h4 class="mt-4">Location</h4>
+                    <p>{{ property.address }}, {{ property.city }}, {{ property.state }} {{ property.zipcode }}</p>
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <!-- Contact/Apply Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>
+                        {% if property.status == 'available' %}
+                        <span class="badge badge-success">Available</span>
+                        {% elif property.status == 'leased' %}
+                        <span class="badge badge-secondary">Leased</span>
+                        {% endif %}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% if property.status == 'available' %}
+                        {% if session.user_id %}
+                            {% if session.role == 'tenant' %}
+                                {% if has_application %}
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle mr-2"></i> You have already applied for this property
+                                </div>
+                                {% else %}
+                                <a href="{{ url_for('apply_property', property_id=property.property_id) }}" class="btn btn-primary btn-block mb-3">
+                                    <i class="fas fa-file-signature mr-2"></i> Apply Now
+                                </a>
+                                {% endif %}
+                            {% endif %}
+                        {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle mr-2"></i> Please <a href="{{ url_for('login') }}">log in</a> to apply for this property
                         </div>
                         {% endif %}
-                        
-                        <h4 class="mt-4">Location</h4>
-                        <p>{{ property.address }}, {{ property.city }}, {{ property.state }} {{ property.zipcode }}</p>
+                    {% elif property.status == 'leased' %}
+                    <div class="alert alert-secondary">
+                        <i class="fas fa-exclamation-circle mr-2"></i> This property is currently leased
                     </div>
+                    {% endif %}
+                    
+                    <!-- Owner Information -->
+                    <h5 class="mt-3">Owner Information</h5>
+                    <p>
+                        <i class="fas fa-user mr-2"></i> {{ owner.first_name }} {{ owner.last_name }}<br>
+                        <i class="fas fa-envelope mr-2"></i> {{ owner.email }}
+                    </p>
+                    
+                    <!-- Property Actions -->
+                    {% if session.user_id and session.user_id == property.owner_id %}
+                    <hr>
+                    <div class="btn-group w-100">
+                        <a href="{{ url_for('edit_property', property_id=property.property_id) }}" class="btn btn-outline-primary">
+                            <i class="fas fa-edit mr-1"></i> Edit
+                        </a>
+                        <button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#deletePropertyModal">
+                            <i class="fas fa-trash-alt mr-1"></i> Delete
+                        </button>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
             
-            <div class="col-md-4">
-                <!-- Status Card -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h4>
-                            {% if property.status == 'available' %}
-                            <span class="badge badge-success">Available</span>
-                            {% elif property.status == 'leased' %}
-                            <span class="badge badge-secondary">Leased</span>
-                            {% endif %}
-                        </h4>
-                    </div>
-                    <div class="card-body">
-                        {% if property.status == 'available' %}
-                            {% if session.user_id %}
-                                {% if session.role == 'tenant' %}
-                                    {% if has_application %}
-                                    <div class="alert alert-info">
-                                        <i class="fas fa-info-circle mr-2"></i> You have already applied for this property
-                                    </div>
-                                    {% else %}
-                                    <a href="{{ url_for('apply_property', property_id=property.property_id) }}" class="btn btn-primary btn-block mb-3">
-                                        <i class="fas fa-file-signature mr-2"></i> Apply Now
-                                    </a>
-                                    {% endif %}
-                                {% endif %}
-                            {% else %}
-                            <div class="alert alert-info">
-                                <i class="fas fa-info-circle mr-2"></i> Please log in to apply for this property
-                            </div>
-                            {% endif %}
-                        {% elif property.status == 'leased' %}
-                        <div class="alert alert-secondary">
-                            <i class="fas fa-exclamation-circle mr-2"></i> This property is currently leased
-                        </div>
-                        {% endif %}
-                        
-                        <!-- Owner Information -->
-                        <h5 class="mt-3">Owner Information</h5>
-                        <p>
-                            <i class="fas fa-user mr-2"></i> {{ owner.first_name }} {{ owner.last_name }}<br>
-                            <i class="fas fa-envelope mr-2"></i> {{ owner.email }}
-                        </p>
-                        
-                        <!-- Property Actions -->
-                        {% if session.user_id and session.user_id == property.owner_id %}
-                        <hr>
-                        <div class="btn-group w-100">
-                            <a href="{{ url_for('edit_property', property_id=property.property_id) }}" class="btn btn-outline-primary">
-                                <i class="fas fa-edit mr-1"></i> Edit
-                            </a>
-                            <button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#deletePropertyModal">
-                                <i class="fas fa-trash-alt mr-1"></i> Delete
-                            </button>
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
+            <!-- Related Properties -->
+            <!-- Here you can add a card showing similar properties -->
+        </div>
+    </div>
+</div>
+
+<!-- Delete Property Modal -->
+{% if session.user_id and session.user_id == property.owner_id %}
+<div class="modal fade" id="deletePropertyModal" tabindex="-1" role="dialog" aria-labelledby="deletePropertyModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deletePropertyModalLabel">Confirm Deletion</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this property? This action cannot be undone.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <form action="{{ url_for('delete_property', property_id=property.property_id) }}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Delete Property</button>
+                </form>
             </div>
         </div>
     </div>
-
-    <!-- Delete Property Modal -->
-    {% if session.user_id and session.user_id == property.owner_id %}
-    <div class="modal fade" id="deletePropertyModal" tabindex="-1" role="dialog" aria-labelledby="deletePropertyModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deletePropertyModalLabel">Confirm Deletion</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    Are you sure you want to delete this property? This action cannot be undone.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <form action="{{ url_for('delete_property', property_id=property.property_id) }}" method="post">
-                        <button type="submit" class="btn btn-danger">Delete Property</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- JavaScript Dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
+</div>
+{% endif %}
+{% endblock %}
