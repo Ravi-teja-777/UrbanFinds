@@ -1087,56 +1087,8 @@ def delete_property(property_id):
 @app.route('/properties/<property_id>/apply', methods=['GET', 'POST'])
 @login_required
 def apply_property(property_id):
-    if request.method == 'POST':
-        try:
-            from decimal import Decimal
-            
-            # Get form data and convert numbers to Decimal
-            # IMPORTANT: Convert to string first to maintain precision
-            monthly_income = Decimal(str(request.form.get('monthly_income', '0')))
-            credit_score = Decimal(str(request.form.get('credit_score', '0')))
-            rent_budget = Decimal(str(request.form.get('rent_budget', '0')))
-            # Convert any other numeric fields similarly
-            
-            # Other application data fields...
-            move_in_date = request.form.get('move_in_date')
-            employment_status = request.form.get('employment_status')
-            employment_length = request.form.get('employment_length')
-            additional_notes = request.form.get('additional_notes')
-            
-            # Create application record
-            application_id = str(uuid.uuid4())
-            tenant_id = session.get('user_id')
-            
-            application_data = {
-                'application_id': application_id,
-                'property_id': property_id,
-                'tenant_id': tenant_id,
-                'monthly_income': monthly_income,
-                'credit_score': credit_score,
-                'rent_budget': rent_budget,
-                'move_in_date': move_in_date,
-                'employment_status': employment_status,
-                'employment_length': employment_length,
-                'additional_notes': additional_notes,
-                'status': 'pending',
-                'created_at': datetime.now().isoformat()
-            }
-            
-            # Save to DynamoDB
-            application_table.put_item(Item=application_data)
-            
-            flash('Application submitted successfully', 'success')
-            return redirect(url_for('view_property', property_id=property_id))
-            
-        except Exception as e:
-            logger.error(f"Application error: {e}")
-            flash(f'Error submitting application: {str(e)}', 'danger')
-            return redirect(url_for('view_property', property_id=property_id))
-    
-    # GET request handling - show application form
     try:
-        # Get property details
+        # Get property details first (needed for both GET and POST)
         response = property_table.get_item(Key={'property_id': property_id})
         
         if 'Item' not in response:
@@ -1144,10 +1096,122 @@ def apply_property(property_id):
             return redirect(url_for('list_properties'))
         
         property_data = response['Item']
-        return render_template('apply_property.html', property=property_data)
-    
+        
+        # Check if property is available
+        if property_data.get('status') != 'available':
+            flash('This property is no longer available for applications', 'warning')
+            return redirect(url_for('view_property', property_id=property_id))
+        
+        # Check if user already has an application for this property
+        tenant_id = session.get('user_id')
+        try:
+            existing_app_response = application_table.scan(
+                FilterExpression=boto3.dynamodb.conditions.Attr('tenant_id').eq(tenant_id) & 
+                                 boto3.dynamodb.conditions.Attr('property_id').eq(property_id)
+            )
+            
+            if existing_app_response.get('Items', []):
+                flash('You have already submitted an application for this property', 'info')
+                return redirect(url_for('view_property', property_id=property_id))
+        except Exception as check_error:
+            logger.warning(f"Could not check existing applications: {check_error}")
+        
+        if request.method == 'POST':
+            try:
+                from decimal import Decimal
+                
+                # Get form data and convert numbers to Decimal
+                monthly_income = Decimal(str(request.form.get('monthly_income', '0')))
+                credit_score = int(request.form.get('credit_score', '0'))  # Credit score is typically an integer
+                rent_budget = Decimal(str(request.form.get('rent_budget', '0')))
+                
+                # Other application data fields
+                move_in_date = request.form.get('move_in_date')
+                employment_status = request.form.get('employment_status')
+                employment_length = request.form.get('employment_length')
+                additional_notes = request.form.get('additional_notes', '')
+                
+                # Validate required fields
+                if not all([monthly_income, move_in_date, employment_status]):
+                    flash('Please fill in all required fields', 'danger')
+                    return render_template('apply_property.html', property=property_data, now=datetime.now())
+                
+                # Validate move-in date is in the future
+                try:
+                    move_in_datetime = datetime.strptime(move_in_date, '%Y-%m-%d')
+                    if move_in_datetime.date() <= datetime.now().date():
+                        flash('Move-in date must be in the future', 'danger')
+                        return render_template('apply_property.html', property=property_data, now=datetime.now())
+                except ValueError:
+                    flash('Invalid move-in date format', 'danger')
+                    return render_template('apply_property.html', property=property_data, now=datetime.now())
+                
+                # Create application record
+                application_id = str(uuid.uuid4())
+                owner_id = property_data['owner_id']  # Get owner_id from property data
+                
+                application_data = {
+                    'application_id': application_id,
+                    'property_id': property_id,
+                    'tenant_id': tenant_id,
+                    'owner_id': owner_id,  # Add the missing owner_id
+                    'monthly_income': monthly_income,
+                    'credit_score': credit_score,
+                    'rent_budget': rent_budget,
+                    'move_in_date': move_in_date,
+                    'employment_status': employment_status,
+                    'employment_length': employment_length,
+                    'additional_notes': additional_notes,
+                    'status': 'pending',
+                    'created_at': datetime.now().isoformat(),
+                    'updated_at': datetime.now().isoformat()
+                }
+                
+                # Log the application data for debugging
+                logger.info(f"Creating application: {application_data}")
+                
+                # Save to DynamoDB
+                application_table.put_item(Item=application_data)
+                
+                # Send notification to owner (optional - comment out if send_notification doesn't exist)
+                try:
+                    owner_message = f"""
+                    New rental application received for your property: {property_data.get('title', 'Property')}
+                    
+                    Applicant details:
+                    - Monthly Income: ${monthly_income}
+                    - Credit Score: {credit_score}
+                    - Desired Move-in Date: {move_in_date}
+                    
+                    Please log in to review the full application.
+                    """
+                    
+                    send_notification(
+                        owner_id,
+                        'New Rental Application',
+                        owner_message,
+                        {'application_id': application_id, 'property_id': property_id}
+                    )
+                except Exception as notification_error:
+                    logger.warning(f"Failed to send notification: {notification_error}")
+                
+                flash('Application submitted successfully! The property owner will review your application.', 'success')
+                return redirect(url_for('view_property', property_id=property_id))
+                
+            except Exception as post_error:
+                logger.error(f"Application submission error: {post_error}")
+                import traceback
+                logger.error(f"Traceback: {traceback.format_exc()}")
+                flash(f'Error submitting application: {str(post_error)}', 'danger')
+                return render_template('apply_property.html', property=property_data, now=datetime.now())
+        
+        # GET request - show application form
+        return render_template('apply_property.html', property=property_data, now=datetime.now())
+        
     except Exception as e:
-        logger.error(f"Application form error: {e}")
+        logger.error(f"Apply property error: {e}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
         flash('Error loading application form', 'danger')
         return redirect(url_for('view_property', property_id=property_id))
 @app.route('/applications/<application_id>')
