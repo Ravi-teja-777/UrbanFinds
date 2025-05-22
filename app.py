@@ -16,6 +16,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from werkzeug.utils import secure_filename
+from flask import send_file, abort
 
 # --------------------------------------- #
 # Load Environment Variables
@@ -1214,7 +1215,10 @@ def apply_property(property_id):
         logger.error(f"Traceback: {traceback.format_exc()}")
         flash('Error loading application form', 'danger')
         return redirect(url_for('view_property', property_id=property_id))
-@app.route('/applications/<application_id>')
+# Add this route to handle POST requests to application details
+# This fixes the 405 Method Not Allowed error
+
+@app.route('/applications/<application_id>', methods=['GET', 'POST'])
 @login_required
 def view_application(application_id):
     try:
@@ -1235,6 +1239,118 @@ def view_application(application_id):
             flash('You do not have permission to view this application', 'danger')
             return redirect(url_for('dashboard'))
         
+        # Handle POST request (for status updates)
+        if request.method == 'POST':
+            # Check if user is authorized to update this application
+            if application['owner_id'] != user_id and user_role != 'admin':
+                flash('You do not have permission to update this application', 'danger')
+                return redirect(url_for('view_application', application_id=application_id))
+            
+            # Update application status
+            new_status = request.form.get('status')
+            notes = request.form.get('notes', '')
+            
+            if new_status not in ['approved', 'rejected']:
+                flash('Invalid status update', 'danger')
+                return redirect(url_for('view_application', application_id=application_id))
+            
+            # Update application in DynamoDB
+            application_table.update_item(
+                Key={'application_id': application_id},
+                UpdateExpression="SET #status = :status, owner_notes = :notes, updated_at = :updated_at",
+                ExpressionAttributeNames={'#status': 'status'},
+                ExpressionAttributeValues={
+                    ':status': new_status,
+                    ':notes': notes,
+                    ':updated_at': datetime.now().isoformat()
+                }
+            )
+            
+            # Get property details for notification
+            property_response = property_table.get_item(Key={'property_id': application['property_id']})
+            property_data = property_response.get('Item', {})
+            
+            # If approved, create booking
+            if new_status == 'approved':
+                # Create booking record
+                booking_id = str(uuid.uuid4())
+                
+                start_date = datetime.strptime(application['move_in_date'], '%Y-%m-%d')
+                # Assuming 12 months lease duration - modify as needed
+                end_date = start_date + timedelta(days=365)
+                
+                booking_data = {
+                    'booking_id': booking_id,
+                    'property_id': application['property_id'],
+                    'tenant_id': application['tenant_id'],
+                    'owner_id': application['owner_id'],
+                    'start_date': start_date.isoformat(),
+                    'end_date': end_date.isoformat(),
+                    'monthly_rent': property_data.get('price', 0),
+                    'status': 'pending_payment',
+                    'created_at': datetime.now().isoformat(),
+                    'updated_at': datetime.now().isoformat()
+                }
+                
+                # Save booking to DynamoDB
+                booking_table.put_item(Item=booking_data)
+                
+                # Update property status to 'leased'
+                property_table.update_item(
+                    Key={'property_id': application['property_id']},
+                    UpdateExpression="SET #status = :status, updated_at = :updated_at",
+                    ExpressionAttributeNames={'#status': 'status'},
+                    ExpressionAttributeValues={
+                        ':status': 'leased',
+                        ':updated_at': datetime.now().isoformat()
+                    }
+                )
+                
+                # Send notification to tenant (if send_notification function exists)
+                try:
+                    tenant_message = f"""
+                    Your application for {property_data.get('title', 'the property')} has been approved!
+                    
+                    Next steps:
+                    1. Complete the payment process
+                    2. Sign the lease agreement
+                    3. Arrange for move-in on {application['move_in_date']}
+                    
+                    Log in to your account to proceed.
+                    """
+                    
+                    send_notification(
+                        application['tenant_id'],
+                        'Application Approved',
+                        tenant_message,
+                        {'booking_id': booking_id, 'application_id': application_id}
+                    )
+                except:
+                    pass  # Continue even if notification fails
+            else:  # rejected
+                # Send notification to tenant (if send_notification function exists)
+                try:
+                    tenant_message = f"""
+                    Your application for {property_data.get('title', 'the property')} has been declined.
+                    
+                    Notes from the owner: {notes}
+                    
+                    Please continue browsing for other available properties.
+                    """
+                    
+                    send_notification(
+                        application['tenant_id'],
+                        'Application Status Update',
+                        tenant_message,
+                        {'application_id': application_id}
+                    )
+                except:
+                    pass  # Continue even if notification fails
+            
+            flash(f"Application {new_status} successfully", 'success')
+            return redirect(url_for('view_application', application_id=application_id))
+        
+        # GET request - show application details
         # Get property details
         property_response = property_table.get_item(Key={'property_id': application['property_id']})
         property_data = property_response.get('Item', {})
@@ -1375,6 +1491,47 @@ def update_application_status(application_id):
         logger.error(f"Update application status error: {e}")
         flash('Error updating application status', 'danger')
         return redirect(url_for('view_application', application_id=application_id))
+# Add this route to handle missing static files (404 errors for images)
+@app.route('/static/uploads/<path:filename>')
+def uploaded_file(filename):
+    """
+    Handle uploaded files and provide fallback for missing images
+    """
+    try:
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        if os.path.exists(file_path):
+            return send_file(file_path)
+        else:
+            # Return a placeholder image or 404
+            logger.warning(f"Missing image file: {filename}")
+            # You can return a default placeholder image here
+            # For now, return 404
+            abort(404)
+    except Exception as e:
+        logger.error(f"Error serving uploaded file {filename}: {e}")
+        abort(404)
+
+# Alternative: Add a template filter to handle missing images
+@app.template_filter('default_image')
+def default_image_filter(image_url):
+    """
+    Template filter to provide default image if original is missing
+    Usage in template: {{ image_url|default_image }}
+    """
+    if not image_url:
+        return '/static/images/placeholder.jpg'  # Make sure this file exists
+    return image_url
+
+# Add this function to check and create upload directory
+def ensure_upload_directory():
+    """Ensure upload directory exists"""
+    upload_dir = app.config.get('UPLOAD_FOLDER', 'static/uploads')
+    if not os.path.exists(upload_dir):
+        os.makedirs(upload_dir)
+        logger.info(f"Created upload directory: {upload_dir}")
+
+# Call this function when the app starts
+ensure_upload_directory()
 
 # --------------------------------------- #
 # Booking Management Routes
